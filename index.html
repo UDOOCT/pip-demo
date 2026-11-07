@@ -88,24 +88,20 @@ h1, h2, h3 { text-wrap: balance; }
 .world { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); aspect-ratio: 390 / 420; width: 100%; }
 .scene-wrap, .scene-wrap .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
 .scene-wrap .scene.fade-in { animation: fade-in .45s ease both; }
-.wok { position: absolute; left: 47%; width: 40%; bottom: 26.6%; aspect-ratio: 150 / 84; z-index: 3; touch-action: none; }
-.wok .wok-svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.wok .spatula { transform-box: view-box; transform-origin: 70px 30px; transform: rotate(var(--rot, 0deg)); transition: transform .08s linear; }
-.wok .flame { opacity: 0; transition: opacity .4s; }
-.wok.hot .flame { opacity: 1; animation: flicker .5s steps(2) infinite; }
-.wok .drop-ring { position: absolute; left: 5%; right: 5%; top: -25%; height: 70%; border-radius: 50%; border: 3px dashed transparent; pointer-events: none; transition: border-color .2s, background .2s; }
-.wok.target .drop-ring { border-color: rgba(75, 46, 36, .45); }
-.wok.over .drop-ring { border-color: var(--tomato); background: rgba(255, 210, 142, .35); }
-.wok.stirring { cursor: grab; }
-.wok.stirring::after { content: ""; position: absolute; left: 50%; top: -38%; width: 64%; aspect-ratio: 2.6; transform: translateX(-50%); border: 3px dashed rgba(75, 46, 36, .35); border-radius: 50%; animation: spin 6s linear infinite; pointer-events: none; }
-.wok.bump { animation: bump .35s ease; }
-.steam-wrap { position: absolute; left: 51%; width: 30%; bottom: 40%; z-index: 2; pointer-events: none; }
-.steam { width: 100%; overflow: visible; }
-.steam path { fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: 5; stroke-linecap: round; animation: steam 2.4s ease-in-out infinite; }
-.steam .s2 { animation-delay: .8s; } .steam .s3 { animation-delay: 1.6s; }
-.plate { position: absolute; left: 49%; width: 38%; bottom: 27.4%; z-index: 4; }
-.plate .dish-art { width: 100%; display: block; }
-.plate.in { animation: plate-in .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+.cook-cv, .fx-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.cook-cv { z-index: 3; }
+.fx-cv { z-index: 8; }
+.cook-cv[hidden] { display: none; }
+/* touch area over the wok: drop target and stirring circle (world units: x 180-360, y 150-310) */
+.wok-hit { position: absolute; z-index: 4; left: 46.15%; width: 46.15%; top: 35.7%; height: 38.1%; touch-action: none; }
+.wok-hit .drop-ring { position: absolute; left: 3.3%; width: 88.9%; top: 48%; height: 28%; border-radius: 50%; border: 3px dashed transparent; pointer-events: none; transition: border-color .2s, background .2s; }
+.wok-hit.target .drop-ring { border-color: rgba(75, 46, 36, .45); }
+.wok-hit.over .drop-ring { border-color: var(--tomato); background: rgba(255, 210, 142, .3); }
+.wok-hit.stirring { cursor: grab; }
+.wok-hit.stirring:active { cursor: grabbing; }
+.wok-hit .stir-guide { position: absolute; left: 47.8%; top: 64%; width: 94%; height: 32%; transform: translate(-50%, -50%); overflow: visible; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.wok-hit.stirring .stir-guide { opacity: 1; }
+.stir-guide ellipse { fill: none; stroke: rgba(75, 46, 36, .42); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 7 9; vector-effect: non-scaling-stroke; animation: dash-run 1.1s linear infinite; }
 
 /* ---------- PIP ---------- */
 .pip-actor { position: absolute; z-index: 6; left: calc(var(--x, 44%) - var(--w, 30%) / 2); bottom: var(--y, 14%); width: var(--w, 30%); aspect-ratio: 1; transition: left .7s cubic-bezier(.4, 0, .2, 1), bottom .7s cubic-bezier(.4, 0, .2, 1); }
@@ -152,13 +148,16 @@ h1, h2, h3 { text-wrap: balance; }
 .mode-easy .port-ring { width: 140px; }
 .port-ring.calm { background: rgba(255, 253, 248, .92); }
 .port-in { width: 100%; height: 100%; border-radius: 50%; background: #FFF0DA; display: grid; place-items: center; overflow: hidden; border: 3px solid var(--paper); position: relative; }
-.port-in .wok-svg { width: 92%; margin-top: 18%; }
-.port-in .wok-svg .spatula { display: none; }
+.port-in.w { background: #FFF0DA; display: block; }
+.port-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.port-in .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.port-in .flash.go { animation: flash .5s ease-out; }
 .port-in.g { background: linear-gradient(#FDEBC8, #FFE0B0); }
 .port-in .port-pip { width: 62%; height: 62%; }
 .port-in .av.big { position: absolute; right: 8%; bottom: 8%; width: 36%; height: 36%; font-size: 17px; border: 3px solid var(--paper); }
 .port-lbl { background: var(--paper); border-radius: 999px; padding: 4px 10px; font-weight: 800; font-size: 12.5px; box-shadow: 0 2px 0 var(--shadow); display: inline-flex; gap: 4px; align-items: center; white-space: nowrap; }
 .mode-easy .port-lbl { font-size: 15px; }
+.port-lbl .mini-pip { width: 22px; height: 22px; margin: -3px 0 -3px -4px; }
 .photo { position: absolute; z-index: 12; inset: 0; display: grid; place-items: center; pointer-events: none; }
 .polaroid { width: 64%; max-width: 250px; background: var(--paper); padding: 10px 10px 14px; border-radius: 8px; box-shadow: 0 10px 30px rgba(122, 78, 40, .3); transform: rotate(-4deg); position: relative; text-align: center; font-weight: 800; }
 .polaroid .dish-art { width: 100%; background: #FFF0DA; border-radius: 4px; display: block; }
@@ -349,6 +348,7 @@ h1, h2, h3 { text-wrap: balance; }
 .about[lang="zh-CN"] { border-top: 2px dashed var(--line); margin-top: 10px; padding-top: 4px; }
 
 /* fliers (drag ghost, falling ingredients) */
+.panel.busy .btn, .panel.busy .tile { opacity: .55; transition: opacity .2s; }
 .flyer { position: fixed; z-index: 9999; pointer-events: none; display: block; }
 .flyer svg, .flyer .ing { width: 100%; height: 100%; display: block; }
 .flyer.drag { filter: drop-shadow(0 10px 8px rgba(75, 46, 36, .25)); }
@@ -398,6 +398,8 @@ h1, h2, h3 { text-wrap: balance; }
 @keyframes spin { to { transform: translateX(-50%) rotate(360deg); } }
 @keyframes spin-plain { to { transform: rotate(360deg); } }
 @keyframes flicker { 0% { transform: scaleY(1); } 100% { transform: scaleY(.9) translateY(2px); } }
+@keyframes flash { 0% { opacity: 0; } 12% { opacity: .95; } 100% { opacity: 0; } }
+@keyframes dash-run { to { stroke-dashoffset: -32; } }
 @keyframes steam { 0% { opacity: 0; transform: translateY(18px); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-26px); } }
 @keyframes bump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(5%) scaleX(1.03); } }
 @keyframes plate-in { from { opacity: 0; transform: translateY(40%) scale(.7); } to { opacity: 1; transform: none; } }
@@ -751,7 +753,7 @@ function windowView(world) {
   }
   return `<rect x="9" y="9" width="114" height="100" rx="10" fill="url(#skyWarm)"/><circle cx="94" cy="38" r="14" fill="#FFE3A3"/><path d="M22 44c0-6 10-8 14-3 4-5 14-3 14 3z" fill="#fff" opacity=".85"/>`;
 }
-// red paper-cut (窗花) on the glass: a flower medallion
+// red paper-cut (chuanghua) on the glass: a flower medallion
 function chuanghua(cx, cy, r) {
   let petals = '';
   for (let k = 0; k < 8; k++) {
@@ -837,30 +839,30 @@ Art.home = function (world, pots) {
 
 /* ---- data.js ---- */
 /* ============================================================
-   Content: dishes, ingredients, reactions, copy (English / 中文)
+   Content: dishes, ingredients, reactions, copy (English)
    ============================================================ */
 const DISHES = {
-  tomato_egg: { core: ['egg', 'tomato'], secrets: ['sugar', 'salt', 'none'], en: 'Tomato & Egg Stir-fry', zh: '番茄炒蛋', short: { en: 'Tomato & Egg', zh: '番茄炒蛋' }, flower: '#E9654F' },
-  fried_rice: { core: ['rice', 'egg'], secrets: ['soy', 'scallion', 'none'], en: 'Egg Fried Rice', zh: '蛋炒饭', short: { en: 'Egg Fried Rice', zh: '蛋炒饭' }, flower: '#FFD45C' },
-  bok_choy: { core: ['garlic', 'bokchoy'], secrets: ['salt', 'sugar', 'none'], en: 'Garlic Bok Choy', zh: '蒜蓉青菜', short: { en: 'Garlic Bok Choy', zh: '蒜蓉青菜' }, flower: '#9DD48A' }
+  tomato_egg: { core: ['egg', 'tomato'], secrets: ['sugar', 'salt', 'none'], en: 'Tomato & Egg Stir-fry', short: { en: 'Tomato & Egg' }, desc: 'Sweet, tangy, a family classic', flower: '#E9654F' },
+  fried_rice: { core: ['rice', 'egg'], secrets: ['soy', 'scallion', 'none'], en: 'Egg Fried Rice', short: { en: 'Egg Fried Rice' }, desc: 'Golden rice with fluffy egg', flower: '#FFD45C' },
+  bok_choy: { core: ['garlic', 'bokchoy'], secrets: ['salt', 'sugar', 'none'], en: 'Garlic Bok Choy', short: { en: 'Garlic Bok Choy' }, desc: 'Garlicky greens, ready in minutes', flower: '#9DD48A' }
 };
 const DISH_ORDER = ['tomato_egg', 'fried_rice', 'bok_choy'];
 
 const ING = {
-  egg: { en: 'egg', zh: '鸡蛋' },
-  tomato: { en: 'tomato', zh: '番茄' },
-  rice: { en: 'rice', zh: '米饭' },
-  garlic: { en: 'garlic', zh: '蒜' },
-  bokchoy: { en: 'bok choy', zh: '青菜' },
-  sugar: { en: 'a pinch of sugar', zh: '一点点糖', tile: { en: 'Pinch of sugar', zh: '一点点糖' } },
-  salt: { en: 'a pinch of salt', zh: '一点盐', tile: { en: 'Pinch of salt', zh: '一点盐' } },
-  soy: { en: 'a splash of soy sauce', zh: '一点酱油', tile: { en: 'Splash of soy', zh: '一点酱油' } },
-  scallion: { en: 'chopped scallions', zh: '撒葱花', tile: { en: 'Scallions', zh: '撒葱花' } },
-  none: { en: 'no secret today', zh: '不加了', tile: { en: 'No secret', zh: '不加了' } },
-  chili: { en: 'chili', zh: '辣椒' },
-  honey: { en: 'honey', zh: '蜂蜜' },
-  cheese: { en: 'cheese', zh: '芝士' },
-  chocolate: { en: 'chocolate', zh: '巧克力' }
+  egg: { en: 'egg', hint: 'Crack it right in!' },
+  tomato: { en: 'tomato', hint: 'Chop, chop, then in it goes!' },
+  rice: { en: 'rice', hint: 'Pour it in and break it up.' },
+  garlic: { en: 'garlic', hint: 'Mince it fine. Smell that!' },
+  bokchoy: { en: 'bok choy', hint: 'In go the greens!' },
+  sugar: { en: 'a pinch of sugar', tile: { en: 'Pinch of sugar' } },
+  salt: { en: 'a pinch of salt', tile: { en: 'Pinch of salt' } },
+  soy: { en: 'a splash of soy sauce', tile: { en: 'Splash of soy' } },
+  scallion: { en: 'chopped scallions', tile: { en: 'Scallions' } },
+  none: { en: 'no secret today', tile: { en: 'No secret' } },
+  chili: { en: 'chili' },
+  honey: { en: 'honey' },
+  cheese: { en: 'cheese' },
+  chocolate: { en: 'chocolate' }
 };
 const TWISTS = ['chili', 'honey', 'cheese', 'chocolate'];
 
@@ -872,56 +874,78 @@ function outcomeOf(dish, twist) {
   return 'odd';
 }
 const REACT = {
-  yum: { face: 'joy', en: 'Mmm! So good!', zh: '好香！太好吃啦！' },
-  spicy: { face: 'love', en: 'Spicy… and SO good!', zh: '辣辣的，好好吃！' },
-  odd: { face: 'curious', en: 'Hmm… that’s… interesting!', zh: '嗯…这味道好特别！' },
-  blehh: { face: 'blehh', en: 'BLEHH! What is that?! Can we cook again?', zh: '哎呀！这是什么味道！再做一次吧？' }
+  yum: { face: 'joy', en: 'Mmm! So good!' },
+  spicy: { face: 'love', en: 'Spicy… and SO good!' },
+  odd: { face: 'curious', en: 'Hmm… that’s… interesting!' },
+  blehh: { face: 'blehh', en: 'BLEHH! What is that?! Can we cook again?' }
 };
 const SECRET_NOTE = {
-  sugar: { en: 'That pinch of sugar is Grandma’s magic.', zh: '奶奶的那一点点糖，真灵！' },
-  salt: { en: 'Just the right salt. Grandma knows.', zh: '咸淡刚刚好！' },
-  soy: { en: 'That splash of soy sauce! Perfect.', zh: '那点酱油，真香！' },
-  scallion: { en: 'Scallions on top make it so fresh.', zh: '葱花一撒，真香！' },
-  none: { en: 'Grandma’s way is the best way.', zh: '奶奶的做法最好吃！' }
+  sugar: { en: 'That pinch of sugar is Grandma’s magic.' },
+  salt: { en: 'Just the right salt. Grandma knows.' },
+  soy: { en: 'That splash of soy sauce! Perfect.' },
+  scallion: { en: 'Scallions on top make it so fresh.' },
+  none: { en: 'Grandma’s way is the best way.' }
 };
 const REPLIES = {
-  eat_more: { zh: '多吃点！', en: 'Eat more!' },
-  great: { zh: '真棒！', en: 'You did great!' },
-  slow: { zh: '慢慢吃～', en: 'Eat slowly, enjoy it!' }
+  eat_more: { en: 'Eat up, sweetie!' },
+  great: { en: 'You did great!' },
+  slow: { en: 'Enjoy every bite!' }
 };
 const REPLY_ORDER = ['eat_more', 'great', 'slow'];
 
 const STR = {
   en: {
-    name_emma: 'Emma', name_grandma: 'Grandma', avatar_emma: 'E', avatar_grandma: '奶',
+    name_emma: 'Emma', name_grandma: 'Grandma', avatar_emma: 'E', avatar_grandma: 'G',
     tagline: 'Little moments, together',
     whose: 'Whose phone is this?', whoseSub: 'Each phone plays one person. PIP keeps both kitchens in sync.',
-    pickEmma: 'Emma', pickEmmaSub: 'Standard · English', pickGrandma: 'Grandma 奶奶', pickGrandmaSub: 'Easy · 中文',
+    pickEmma: 'Emma', pickEmmaSub: 'Standard mode', pickGrandma: 'Grandma', pickGrandmaSub: 'Easy mode, bigger text',
     pickBoth: 'Show both phones on one screen',
     st_live: 'Live sync', st_local: 'Same screen', st_connecting: 'Connecting…', st_tabs: 'This device only', st_view: 'View only',
+    st_reconnecting: 'Reconnecting…', st_offline: 'No sync',
+    offline_help: 'Can’t reach the sync server on this network. Try mobile data, or use both phones on one screen.',
+    kitchen_code: 'Kitchen code', send_link: 'Send {name}’s link', copied: 'Link copied ✓',
     here: 'here', away: 'away',
-    menu: 'Menu', soundOn: 'Sound on', soundOff: 'Sound off',
+    menu: 'Menu', soundOn: 'Sound on', soundOff: 'Sound off', listen: 'Listen',
+    // Grandma home
+    g_home_bubble: 'Has Emma eaten yet? Want to teach her a dish?',
+    g_home_title: 'Teach Emma a dish?', g_home_sub: 'PIP will take your invitation to her.',
+    yes_teach: 'Yes, teach her!', later: 'Maybe later', later_bubble: 'Okay! Tap me whenever you want to teach.',
+    choose_dish: 'Which dish will you teach?', back: 'Back',
+    waiting_t: 'PIP went to get Emma', waiting: 'Today’s lesson: {dish}', cancel: 'Cancel',
+    declined_t: 'Emma will come a bit later', declined: 'PIP will tell you as soon as she’s ready.',
+    // Grandma cooking
+    pick1_bubble: 'Emma is here! What goes in first?', pick1_t: 'What goes in first?', your_way: 'Your way is the right way.',
+    sent_t: 'PIP is delivering it', e_adding: 'Emma is adding the {ing}…',
+    pick2_bubble: 'In it went! Next is the {ing}. Add your secret?', pick2_t: 'Add your secret touch?', pick2_sub: 'Next is the {ing}.',
+    e_cooking_t: 'Emma is cooking', f_added: 'Added the {ing}', f_secret: 'Sprinkled your secret',
+    f_twist_wait: 'Thinking about her own twist…', f_twist: 'Added: {t}!', f_notwist: 'No twist, your way',
+    f_stir: 'Stirring…', f_stirred: 'Stirred! Waiting for you', serve_btn: 'It’s ready, serve!', serve_wait: 'A bit more stirring…',
+    photo: 'PIP sent you a photo', e_thanked: 'Emma says: Thank you, Grandma!', reply_t: 'Reply to Emma:', replied: 'Reply sent',
+    port_e: 'Emma’s wok', port_g: 'Grandma is choosing',
     // Emma home
     e_home_bubble: 'Hi Emma! I kept your room cozy.',
     e_home_title: 'PIP’s cozy room',
     e_home_sub: 'When Grandma wants to cook with you, PIP brings her invitation.',
-    moments: 'Our Little Moments', wave: 'Wave to Grandma', waved: 'Wave sent',
+    moments: 'Our Little Moments', wave_to_g: 'Wave to Grandma', wave_to_e: 'Wave to Emma', waved: 'Wave sent',
     // invitation
-    inv_title: 'Grandma wants to teach you a dish!', inv_lesson: 'Today’s lesson', join: 'Join Grandma’s kitchen', notNow: 'Not now',
+    inv_title: 'Grandma wants to teach you a dish!', inv_lesson: 'Today’s lesson', inv_quote: 'Emma, come! Let me teach you my {dish}.',
+    join: 'Join Grandma’s kitchen', notNow: 'Not now',
     open_title: 'Grandma’s kitchen is open', open_sub: 'Join whenever you’re ready. No rush.', joinNow: 'Join now',
-    // cooking
-    lesson: 'Grandma’s {dish}', taught: 'Taught by Grandma · cooked by you',
+    // Emma cooking
+    lesson: 'Grandma’s {dish}', taught: 'Taught by Grandma · cooked by you', steps: 'Steps',
     pip_with_g: 'PIP is with Grandma', pip_with_e: 'PIP is with Emma',
     wait_first_t: 'Grandma is choosing', wait_first: 'What goes in first? That’s Grandma’s call.',
     g_says_first: 'Grandma says: {ing} first!',
-    add_t: 'Add the {ing}', add_sub: 'Drag it from PIP into the wok, or tap the button.', add_btn: 'Add {ing} to the wok',
+    add_t: 'Add the {ing}', add_sub: 'Drag it from PIP into the wok, or tap the button.', add_btn: 'Add the {ing}',
     wait_secret_t: 'Grandma is thinking', wait_secret: 'Does it need her secret touch? 🤫',
     next_is: 'Next: {ing}!', secret_is: 'Grandma’s secret: {s} 🤫', no_secret: 'No secret today. Just Grandma’s way.',
-    sprinkle_t: 'Sprinkle Grandma’s secret', sprinkle_sub: '{s}, exactly how she does it.', sprinkle_btn: 'Sprinkle it in',
+    sprinkle_t: 'Add Grandma’s secret', sprinkle_sub: '{s}, exactly how she does it.', sprinkle_btn: 'Add it in',
     twist_t: 'Your turn: add a twist?', twist_sub: 'Optional. PIP will taste whatever you make.', no_twist: 'Keep it Grandma’s way',
+    twist_bubble: 'Your turn! Anything to add?',
     stir_t: 'Stir it up!', stir_sub: 'Circle your finger around the wok, or hold the button.', stir_btn: 'Hold to stir',
-    stir_done_t: 'Smells amazing!', stir_done: 'Grandma decides when it’s ready. Waiting for her “出锅!”',
-    served: 'Grandma says 出锅! It’s ready!', tasting: 'PIP is tasting…',
+    stir_bubble: 'Stir, stir, stir!', stirred_bubble: 'Smells so good!',
+    stir_done_t: 'Smells amazing!', stir_done: 'Grandma decides when it’s ready. Waiting for her call.',
+    served: 'Grandma says it’s ready!', tasting: 'PIP is tasting…',
     // card
     card_title: 'Grandma’s {dish}', card_meta: 'Taught by Grandma · cooked by Emma · {date}', attempt: 'Try {n}',
     c_g: 'Grandma', c_e: 'Emma', c_way: '{a} first, then {b}', c_secret: 'Secret: {s}', c_nosecret: 'No secret today',
@@ -931,7 +955,7 @@ const STR = {
     // moments
     m_title: 'Our Little Moments', m_sub: 'All the little things we’ve done together.', m_empty: 'Cook together once and your first keepsake card will appear here.',
     // settings
-    settings: 'Settings', language: 'Language', mode: 'Mode', standard: 'Standard', easy: 'Easy', sound: 'Sound', on: 'On', off: 'Off',
+    settings: 'Settings', mode: 'Mode', standard: 'Standard', easy: 'Easy', sound: 'Sound', on: 'On', off: 'Off',
     switch_role: 'Switch phone', reset: 'Start over', reset_sub: 'Clears the kitchen and the moments on both phones.', end_session: 'End this cooking session',
     about: 'About this demo', close: 'Close', both_view: 'Both phones on one screen', sync_status: 'Sync',
     // toasts / announcements
@@ -939,96 +963,24 @@ const STR = {
     t_e_twist: 'Emma added {t}!', t_e_joined: 'Emma joined the kitchen', t_g_reply: 'Grandma replied: {r}',
     dup_role: 'Another phone is also playing {name}.', readonly: 'View only. Sign in as the owner to play, or use both phones on one screen.',
     connecting_hold: 'Connecting to the other phone…'
-  },
-  zh: {
-    name_emma: 'Emma', name_grandma: '奶奶', avatar_emma: 'E', avatar_grandma: '奶',
-    tagline: '一起的小时光',
-    whose: '这是谁的手机？', whoseSub: '每台手机扮演一个人，PIP 让两个厨房同步。',
-    pickEmma: 'Emma', pickEmmaSub: '标准 · English', pickGrandma: '奶奶 Grandma', pickGrandmaSub: '简单 · 中文',
-    pickBoth: '两台手机放在一个屏幕上',
-    st_live: '实时同步', st_local: '同屏演示', st_connecting: '连接中…', st_tabs: '仅本机', st_view: '只能看',
-    here: '在线', away: '不在',
-    menu: '菜单', soundOn: '声音开', soundOff: '声音关',
-    g_home_bubble: 'Emma 吃饭了吗？要不要教她做一道菜？',
-    g_home_title: '要教 Emma 做菜吗？', g_home_sub: 'PIP 会把您的邀请送给她。',
-    yes_teach: '好呀，教她！', later: '下次吧', later_bubble: '好的～想教的时候点我就行！',
-    choose_dish: '教她做哪道菜？', back: '返回',
-    waiting_t: 'PIP 去叫 Emma 了', waiting: '今天教：{dish}', cancel: '不做了',
-    declined_t: 'Emma 说等一会儿就来', declined: '她准备好了，PIP 会马上告诉您。',
-    pick1_bubble: 'Emma 来啦！先放什么？', pick1_t: '先放什么？', your_way: '按您的习惯来～',
-    sent_t: 'PIP 送去了！', e_adding: 'Emma 正在把{ing}放进锅里…',
-    pick2_bubble: '放好啦！接下来放{ing}。要加您的秘方吗？', pick2_t: '要加您的秘方吗？',
-    e_cooking_t: 'Emma 在做菜', f_added: '放了{ing}', f_secret: '撒上了您的秘方', f_twist_wait: '在想要不要加点自己的创意…',
-    f_twist: '加了：{t}！', f_notwist: '照您的做法，没加别的', f_stir: '翻炒中…', f_stirred: '炒好了，等您说出锅',
-    serve_btn: '火候到了，出锅！', serve_wait: '再炒一会儿…',
-    photo: 'PIP 给您拍了张照片',
-    card_title: '奶奶的{dish}', card_meta: '奶奶教 · Emma 做 · {date}', attempt: '第 {n} 次',
-    c_g: '奶奶', c_e: 'Emma', c_way: '先放{a}，再放{b}', c_secret: '秘方：{s}', c_nosecret: '今天不加秘方',
-    c_cooked: '放好食材、翻炒出锅', c_twist: '自己的创意：{t}', c_notwist: '照奶奶的做法',
-    pip_says: 'PIP 说', e_thanked: 'Emma 说：谢谢奶奶！', reply_t: '回 Emma 一句：', replied: '已回复',
-    cook_again: '再做一次', back_home: '回家', creative: '一次很有创意的尝试',
-    m_title: '我们的回忆', m_sub: '我们一起做过的小事。', m_empty: '一起做一次菜，第一张回忆卡片就会出现在这里。',
-    moments: '我们的回忆', wave: '挥挥手',
-    settings: '设置', language: '语言', mode: '模式', standard: '标准', easy: '简单', sound: '声音', on: '开', off: '关',
-    switch_role: '换一台手机身份', reset: '重新开始', reset_sub: '清空两台手机的厨房和回忆。', end_session: '结束这次做菜',
-    about: '关于这个演示', close: '关闭', both_view: '两台手机同屏', sync_status: '同步',
-    t_g_chose: '奶奶选了{ing}', t_e_added: 'Emma 放好了{ing}', t_wave_g: '奶奶向你挥手 👋', t_wave_e: 'Emma 向您挥挥手 👋',
-    t_e_twist: 'Emma 加了{t}！', t_e_joined: 'Emma 来厨房啦', t_g_reply: '奶奶说：{r}',
-    dup_role: '另一台手机也在当{name}。', readonly: '只能看。用拥有者账号登录才能操作，或者用同屏演示。',
-    connecting_hold: '正在连接另一台手机…',
-    listen: '听一听'
   }
 };
-STR.en.listen = 'Listen';
-STR.en.g_home_bubble = 'Has Emma eaten? Want to teach her a dish?';
-STR.en.g_home_title = 'Teach Emma a dish?'; STR.en.g_home_sub = 'PIP will take your invitation to her.';
-STR.en.yes_teach = 'Yes, teach her!'; STR.en.later = 'Maybe later'; STR.en.later_bubble = 'Okay! Tap me whenever you want to teach.';
-STR.en.choose_dish = 'Which dish will you teach?'; STR.en.back = 'Back';
-STR.en.waiting_t = 'PIP went to get Emma'; STR.en.waiting = 'Today’s lesson: {dish}'; STR.en.cancel = 'Cancel';
-STR.en.declined_t = 'Emma will come a bit later'; STR.en.declined = 'PIP will tell you as soon as she’s ready.';
-STR.en.pick1_bubble = 'Emma is here! What goes in first?'; STR.en.pick1_t = 'What goes in first?'; STR.en.your_way = 'Your way is the right way.';
-STR.en.sent_t = 'PIP is delivering it'; STR.en.e_adding = 'Emma is adding the {ing}…';
-STR.en.pick2_bubble = 'Done! Next is the {ing}. Add your secret?'; STR.en.pick2_t = 'Add your secret touch?';
-STR.en.e_cooking_t = 'Emma is cooking'; STR.en.f_added = 'Added the {ing}'; STR.en.f_secret = 'Sprinkled your secret';
-STR.en.f_twist_wait = 'Thinking about her own twist…'; STR.en.f_twist = 'Added: {t}!'; STR.en.f_notwist = 'No twist, your way';
-STR.en.f_stir = 'Stirring…'; STR.en.f_stirred = 'Stirred! Waiting for you'; STR.en.serve_btn = 'It’s ready, serve! 出锅'; STR.en.serve_wait = 'A bit more stirring…';
-STR.en.photo = 'PIP sent you a photo'; STR.en.e_thanked = 'Emma says: Thank you, Grandma!'; STR.en.reply_t = 'Reply to Emma:'; STR.en.replied = 'Reply sent';
-
-
-Object.assign(STR.zh, {
-  e_home_bubble: 'Emma，你好呀！我把房间收拾得暖暖的。', e_home_title: 'PIP 的小窝', e_home_sub: '奶奶想和你一起做菜时，PIP 会把她的邀请送来。',
-  waved: '已挥手', inv_title: '奶奶想教你做一道菜！', inv_lesson: '今天的课', join: '去奶奶的厨房', notNow: '等一会儿',
-  open_title: '奶奶的厨房开着呢', open_sub: '准备好了就来，不着急。', joinNow: '现在就去',
-  lesson: '奶奶的{dish}', taught: '奶奶教 · 你来做', pip_with_g: 'PIP 在奶奶那儿', pip_with_e: 'PIP 在 Emma 那儿',
-  wait_first_t: '奶奶在选', wait_first: '先放什么？听奶奶的。', g_says_first: '奶奶说：先放{ing}！',
-  add_t: '把{ing}放进锅里', add_sub: '把它从 PIP 那儿拖进锅里，或者点下面的按钮。', add_btn: '把{ing}放进锅',
-  wait_secret_t: '奶奶在想', wait_secret: '要不要加她的秘方呢？🤫', next_is: '接下来：{ing}！', secret_is: '奶奶的秘方：{s} 🤫', no_secret: '今天不加秘方，就照奶奶的做法。',
-  sprinkle_t: '撒上奶奶的秘方', sprinkle_sub: '{s}，跟奶奶做的一样。', sprinkle_btn: '撒进去',
-  twist_t: '轮到你：加点自己的创意？', twist_sub: '可以不加。PIP 会尝尝你做的。', no_twist: '照奶奶的做法',
-  stir_t: '翻炒起来！', stir_sub: '手指绕着锅画圈，或者按住按钮。', stir_btn: '按住翻炒',
-  stir_done_t: '好香啊！', stir_done: '什么时候出锅，奶奶说了算。等她说“出锅！”',
-  served: '奶奶说：出锅！做好啦！', tasting: 'PIP 在尝…', thank: '谢谢奶奶', thanked: '已经谢过奶奶', from_g: '奶奶说',
-  g_wait_reply: '奶奶可以回你一句。', e_thanks: '谢谢奶奶！'
-});
-
-Object.assign(STR.en, { st_reconnecting: 'Reconnecting…', st_offline: 'No sync', offline_help: 'Can’t reach the sync server on this network. Try mobile data, or use both phones on one screen.', kitchen_code: 'Kitchen code', send_link: 'Send {name}’s link', copied: 'Link copied ✓' });
-Object.assign(STR.zh, { st_reconnecting: '重新连接中…', st_offline: '未同步', offline_help: '这个网络连不上同步服务器。试试换成手机流量，或者用两台手机同屏。', kitchen_code: '厨房号', send_link: '把{name}的链接发出去', copied: '链接已复制 ✓' });
 
 const STEPS = [
-  { who: 'grandma', en: 'First in', zh: '先放' },
-  { who: 'emma', en: 'Into wok', zh: '下锅' },
-  { who: 'grandma', en: 'Secret', zh: '秘方' },
-  { who: 'emma', en: 'Cook', zh: '翻炒' },
-  { who: 'grandma', en: 'Serve', zh: '出锅' }
+  { who: 'grandma', en: 'First in' },
+  { who: 'emma', en: 'Into wok' },
+  { who: 'grandma', en: 'Secret' },
+  { who: 'emma', en: 'Cook' },
+  { who: 'grandma', en: 'Serve' }
 ];
 
 function tr(lang, key, vars) {
-  let s = (STR[lang] && STR[lang][key]) ?? STR.en[key] ?? key;
+  let s = STR.en[key] ?? key;
   if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
   return s;
 }
-function ingName(k, lang) { return ING[k] ? ING[k][lang] : k; }
-function dishName(k, lang) { return DISHES[k] ? DISHES[k][lang] : k; }
+function ingName(k) { return ING[k] ? ING[k].en : k; }
+function dishName(k) { return DISHES[k] ? DISHES[k].en : k; }
 
 /* ---- sync.js ---- */
 /* ============================================================
@@ -1395,6 +1347,814 @@ class MqttHub extends BaseHub {
   }
 }
 
+/* ---- cook.js ---- */
+/* ============================================================
+   Cooking stage (canvas)
+   Stove and flames, the wok, food that falls, bounces, sizzles
+   and browns, entrances for each ingredient (egg crack, chopping,
+   pouring, sprinkling), stirring and wok tosses, steam and oil,
+   plating, PIP's bites and reactions.
+   Everything is drawn in world units (390 x 420), the same space
+   as the illustrated kitchen behind it.
+   ============================================================ */
+const COOK_G = 980;
+const WOK = { cx: 266, rimY: 248, rx: 68, ry: 13 };
+const STOVE_RX = 54;
+const PLATE = { cx: 186, cy: 301, rx: 46, ry: 11 };
+const DROP = { x: 262, y: 211 };
+const FOOD_LINE = 'rgba(91,58,46,.62)';
+const rr = (a, b) => a + Math.random() * (b - a);
+const EASE = {
+  lin: t => t,
+  out: t => 1 - Math.pow(1 - t, 3),
+  inOut: t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+  back: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+};
+const HEX = {};
+function hexRgb(c) { if (HEX[c]) return HEX[c]; const n = parseInt(c.slice(1), 16); return (HEX[c] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]); }
+function hexMix(c1, c2, t) {
+  t = Math.max(0, Math.min(1, t));
+  const a = hexRgb(c1), b = hexRgb(c2);
+  return `rgb(${Math.round(a[0] + (b[0] - a[0]) * t)},${Math.round(a[1] + (b[1] - a[1]) * t)},${Math.round(a[2] + (b[2] - a[2]) * t)})`;
+}
+function rgbMix(c, h, t) {
+  // c: 'rgb(r,g,b)' from hexMix, h: hex
+  const m = c.match(/\d+/g).map(Number), b = hexRgb(h);
+  return `rgb(${Math.round(m[0] + (b[0] - m[0]) * t)},${Math.round(m[1] + (b[1] - m[1]) * t)},${Math.round(m[2] + (b[2] - m[2]) * t)})`;
+}
+function rrect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function blob(ctx, r, sh, ox = 0, oy = 0, squash = 0.8) {
+  const n = sh.length; ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
+    const r0 = r * (0.78 + sh[i] * 0.36), r1 = r * (0.78 + sh[(i + 1) % n] * 0.36);
+    const x0 = ox + Math.cos(a0) * r0, y0 = oy + Math.sin(a0) * r0 * squash;
+    const x1 = ox + Math.cos(a1) * r1, y1 = oy + Math.sin(a1) * r1 * squash;
+    const am = (a0 + a1) / 2, rm = ((r0 + r1) / 2) * 1.14;
+    if (i === 0) ctx.moveTo(x0, y0);
+    ctx.quadraticCurveTo(ox + Math.cos(am) * rm, oy + Math.sin(am) * rm * squash, x1, y1);
+  }
+  ctx.closePath();
+}
+function heartPath(ctx, s) {
+  ctx.beginPath(); ctx.moveTo(0, s * 0.35);
+  ctx.bezierCurveTo(-s * 1.1, -s * 0.35, -s * 0.5, -s * 1.05, 0, -s * 0.45);
+  ctx.bezierCurveTo(s * 0.5, -s * 1.05, s * 1.1, -s * 0.35, 0, s * 0.35); ctx.closePath();
+}
+function starPath(ctx, s) {
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? s * 0.32 : s; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+  ctx.closePath();
+}
+function flamePath(ctx, x, y, w, h) {
+  ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.quadraticCurveTo(x - w / 2, y - h * 0.55, x, y - h); ctx.quadraticCurveTo(x + w / 2, y - h * 0.55, x + w / 2, y); ctx.closePath();
+}
+
+/* raw -> cooked colors, how many pieces, piece size */
+const FOOD = {
+  egg: { n: 9, raw: '#FFE57E', cooked: '#FFB82E', size: [8.5, 11.5] },
+  tomato: { n: 8, raw: '#F45E45', cooked: '#D7412B', size: [9.5, 12] },
+  rice: { n: 44, raw: '#FFFFFF', cooked: '#FCE7B0', size: [1, 1] },
+  garlic: { n: 16, raw: '#FBF1DC', cooked: '#EEC56C', size: [2.6, 3.4] },
+  bokchoy: { n: 6, raw: '#8CCD72', cooked: '#4E9E44', size: [10.5, 13.5], gmul: 0.38, sway: true },
+  scallion: { n: 14, raw: '#9AD27F', cooked: '#6EB156', size: [2.4, 3.1] },
+  chili: { n: 10, raw: '#EC4532', cooked: '#C9311F', size: [3.3, 4.3] },
+  cheese: { n: 13, raw: '#FFD45C', cooked: '#FFE6A0', size: [7, 10] },
+  chocolate: { n: 8, raw: '#7A4A35', cooked: '#4E2619', size: [4.8, 6.4] }
+};
+const GLAZE = { soy: '#7A4325', honey: '#F0A535' };
+const IMG = {};
+function iconImg(name) {
+  if (IMG[name]) return IMG[name];
+  const svg = Art.icon(name).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" ');
+  const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  IMG[name] = img; return img;
+}
+function preloadCookIcons() { ['egg', 'tomato', 'rice', 'garlic', 'bokchoy', 'sugar', 'salt', 'soy', 'scallion', 'chili', 'honey', 'cheese', 'chocolate'].forEach(iconImg); }
+
+class CookStage {
+  constructor(cv, fx, opts = {}) {
+    this.cv = cv; this.fx = fx || null; this.mini = !!opts.mini; this.sfx = opts.sfx || (() => { });
+    // the porthole shows a close-up of the wok
+    this.view = this.mini ? { x: 181, y: 150, w: 180, h: 180 } : { x: 0, y: 0, w: 390, h: 420 };
+    this.reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    this.running = false; this.t = 0; this.last = 0;
+    this.reset();
+    this.loop = this.loop.bind(this);
+    preloadCookIcons();
+    this.resize();
+  }
+  reset() {
+    (this.drops || []).forEach(d => d.res && d.res());
+    (this.tweens || []).forEach(tw => tw.res && tw.res());
+    this.pieces = []; this.oil = []; this.steam = []; this.fxs = []; this.sprites = []; this.shells = []; this.drops = []; this.streams = []; this.slashes = []; this.tweens = []; this.pools = [];
+    this.items = new Set(); this.wok = { dx: 0, dy: 0, rot: 0 }; this.shake = 0; this.heat = 0; this.heatTarget = 0; this.flare = 0;
+    this.spat = { on: false, a: -0.6, ta: -0.6, bx: null, by: null, auto: false, until: 0 };
+    this.plate = { on: false, k: 0 }; this.cookTarget = 0; this.lastToss = -9; this.rl = 0;
+    this.queue = Promise.resolve(); this.gen = (this.gen || 0) + 1;
+  }
+  clear() { this.reset(); this.drawNow(); }
+  resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    for (const c of [this.cv, this.fx]) {
+      if (!c) continue;
+      const w = c.clientWidth, h = c.clientHeight;
+      if (!w || !h) continue;
+      const W = Math.round(w * dpr), H = Math.round(h * dpr);
+      if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+      c._dpr = dpr; c._w = w; c._h = h;
+    }
+    this.drawNow();
+  }
+  start() { if (this.running) return; this.running = true; this.last = performance.now(); requestAnimationFrame(this.loop); }
+  stop() { this.running = false; }
+  loop(now) {
+    if (!this.running) return;
+    const dt = Math.min(0.05, Math.max(0, (now - this.last) / 1000)); this.last = now;
+    this.update(dt); this.draw();
+    requestAnimationFrame(this.loop);
+  }
+  drawNow() { try { this.draw(); } catch (e) { } }
+  wait(ms) { const g = this.gen; return new Promise(r => setTimeout(() => r(g === this.gen), ms)); }
+  tween(obj, key, from, to, ms, ease = EASE.out) {
+    if (this.reduce) { obj[key] = to; return Promise.resolve(); }
+    return new Promise(res => { obj[key] = from; this.tweens.push({ obj, key, from, to, t: 0, d: Math.max(0.001, ms / 1000), ease, res }); });
+  }
+  tweenWok(to, ms, ease = EASE.inOut) { return Promise.all(Object.keys(to).map(k => this.tween(this.wok, k, this.wok[k], to[k], ms, ease))); }
+  /* where a point drawn inside the (moving) wok really is */
+  poseXY(x, y) {
+    const sh = this.shake, wob = Math.sin(this.t * 38) * sh;
+    const px = WOK.cx, py = WOK.rimY + 20, a = this.wok.rot + wob * 0.05, c = Math.cos(a), s = Math.sin(a);
+    const lx = x - px, ly = y - py;
+    return { x: px + this.wok.dx + wob * 5 + lx * c - ly * s, y: py + this.wok.dy - Math.abs(wob) * 4 + lx * s + ly * c };
+  }
+
+  /* ---------------- food ---------------- */
+  piece(kind, x, y, vx = 0, vy = 0, home = 'wok') {
+    const f = FOOD[kind]; if (!f) return null;
+    const sh = []; for (let i = 0; i < (kind === 'rice' ? 12 : 7); i++) sh.push(Math.random());
+    const p = { kind, x, y, vx, vy, rot: rr(0, Math.PI * 2), vr: rr(-6, 6), s: rr(f.size[0], f.size[1]), shape: sh, cooked: 0, glaze: null, glazeAmt: 0,
+      home, grounded: false, layer: rr(0, 7), gmul: f.gmul || 1, sway: !!f.sway, seed: rr(0, 10), alpha: 1, scale: 1, glint: 0 };
+    this.pieces.push(p); return p;
+  }
+  floorY(p) {
+    if (p.home === 'plate') {
+      const u = Math.max(-1, Math.min(1, (p.x - PLATE.cx) / (PLATE.rx - 10)));
+      return PLATE.cy - 2 - 8 * (1 - u * u) - p.layer * 0.8;
+    }
+    const u = Math.max(-1, Math.min(1, (p.x - WOK.cx) / (WOK.rx - 10)));
+    return WOK.rimY + 6 + 4 * (1 - u * u) - p.layer * 0.9;
+  }
+  settle(kind) {
+    const f = FOOD[kind]; if (!f) return;
+    for (let i = 0; i < f.n; i++) {
+      const p = this.piece(kind, WOK.cx + rr(-44, 44), 0); p.y = this.floorY(p); p.grounded = true; p.vr = 0; p.cooked = Math.min(this.cookTarget, 0.5);
+    }
+  }
+  applyGlaze(kind, amt) { this.pieces.forEach(p => { if (p.home === 'wok') { p.glaze = GLAZE[kind]; p.glazeAmt = amt; } }); }
+  /* put things in the wok without a show (opened mid-way, reduced motion) */
+  ensure(items, animate) {
+    for (const k of items) {
+      if (this.items.has(k)) continue;
+      if (animate && !this.reduce) { this.add(k); continue; }
+      this.items.add(k);
+      if (FOOD[k]) this.settle(k);
+      else if (GLAZE[k]) this.applyGlaze(k, 0.4);
+    }
+  }
+  /* an ingredient's entrance; resolves once it has landed */
+  add(kind, o = {}) {
+    if (this.items.has(kind)) return Promise.resolve();
+    this.items.add(kind);
+    const g = this.gen;
+    const run = () => {
+      if (g !== this.gen) return;
+      if (this.reduce) { if (FOOD[kind]) this.settle(kind); else if (GLAZE[kind]) this.applyGlaze(kind, 0.4); this.sfx('plop'); return this.wait(120); }
+      switch (kind) {
+        case 'egg': return this.crackEgg(o);
+        case 'rice': return this.pourRice(o);
+        case 'sugar': case 'salt': return this.shake_in(kind, o);
+        case 'soy': case 'honey': return this.pourLiquid(kind, o);
+        case 'garlic': return this.chop(kind, o, 3);
+        case 'chocolate': return this.chop(kind, o, 1, true);
+        default: return FOOD[kind] ? this.chop(kind, o, 2) : this.wait(80);
+      }
+    };
+    const p = this.queue.then(run);
+    this.queue = p.catch(() => { });
+    return p;
+  }
+  sprite(name, x, y, size, o = {}) {
+    const s = { name, x, y, size, rot: 0, k: o.handoff ? 1 : 0.4, alpha: 1, wob: 0, crack: 0, dead: false };
+    this.sprites.push(s); iconImg(name); return s;
+  }
+  async enter(sp, o) { if (!o.handoff) await this.tween(sp, 'k', 0.4, 1, 220, EASE.back); }
+  // a point given in the 64-unit icon box, as it sits now in the world
+  spPoint(sp, lx, ly) {
+    const sc = (sp.size / 64) * sp.k, x = (lx - 32) * sc, y = (ly - 32) * sc, c = Math.cos(sp.rot), s = Math.sin(sp.rot);
+    return { x: sp.x + x * c - y * s, y: sp.y + x * s + y * c };
+  }
+  async crackEgg(o) {
+    const g = this.gen, ok = () => g === this.gen;
+    const sp = this.sprite('egg', DROP.x, DROP.y, 44, o);
+    await this.enter(sp, o); if (!ok()) return;
+    sp.wob = 1; await this.wait(220); sp.wob = 0; if (!ok()) return;
+    this.sfx('crack'); sp.crack = 1; await this.wait(150); if (!ok()) return;
+    sp.dead = true;
+    for (const side of [-1, 1]) this.shells.push({ x: DROP.x + side * 5, y: DROP.y - 4, vx: side * rr(70, 100), vy: rr(-130, -80), rot: 0, vr: side * rr(5, 8), side, t: 0, life: 0.85 });
+    await new Promise(res => this.drops.push({ x: DROP.x, y: DROP.y + 4, vy: 60, res, stretch: 0 })); if (!ok()) return;
+    this.sfx('sizzle'); this.flare = 0.6;
+    this.oilBurst(WOK.cx, WOK.rimY + 6, 12);
+    const pool = { x: DROP.x + 2, y: WOK.rimY + 7, t: 0, life: 0.5, sh: Array.from({ length: 9 }, () => Math.random()) };
+    this.pools.push(pool);
+    await this.wait(500); if (!ok()) return;
+    this.pools.splice(this.pools.indexOf(pool), 1);
+    // the egg sets and breaks into soft curds
+    for (let i = 0; i < FOOD.egg.n; i++) {
+      const p = this.piece('egg', pool.x + rr(-22, 22), WOK.rimY + rr(2, 8), rr(-50, 50), rr(-140, -60), 'wok');
+      p.cooked = 0.1; p.vr = rr(-4, 4);
+    }
+    this.sfx('toss');
+    await this.wait(260);
+  }
+  async chop(kind, o, cuts, crunch) {
+    const g = this.gen, ok = () => g === this.gen;
+    const sp = this.sprite(kind, DROP.x, DROP.y, 44, o);
+    await this.enter(sp, o); if (!ok()) return;
+    sp.wob = 1; await this.wait(170); sp.wob = 0; if (!ok()) return;
+    const angles = [-0.7, 0.6, -0.1];
+    for (let i = 0; i < cuts; i++) {
+      this.sfx(crunch ? 'crack' : 'chop'); this.slashes.push({ x: DROP.x, y: DROP.y, a: angles[i % 3], t: 0 });
+      sp.k = 0.94; this.tween(sp, 'k', 0.94, 1, 90);
+      await this.wait(i === cuts - 1 ? 90 : 95); if (!ok()) return;
+    }
+    sp.dead = true;
+    const f = FOOD[kind];
+    for (let i = 0; i < f.n; i++) {
+      const p = this.piece(kind, DROP.x + rr(-12, 12), DROP.y + rr(-10, 10), rr(-70, 70), rr(-130, -20), 'wok');
+      p.vr = rr(-10, 10);
+    }
+    setTimeout(() => { if (ok()) { this.sfx('sizzle'); this.flare = Math.max(this.flare, 0.5); } }, kind === 'bokchoy' ? 520 : 300);
+    await this.wait(kind === 'bokchoy' ? 1050 : 560);
+  }
+  async pourRice(o) {
+    const g = this.gen, ok = () => g === this.gen;
+    const sp = this.sprite('rice', DROP.x - 26, DROP.y + 6, 46, o);
+    await this.enter(sp, o); if (!ok()) return;
+    await this.tween(sp, 'rot', 0, 1.9, 300, EASE.inOut); if (!ok()) return;
+    this.sfx('pour');
+    const dirx = Math.sin(sp.rot), diry = -Math.cos(sp.rot);
+    for (let i = 0; i < FOOD.rice.n; i++) {
+      const l = this.spPoint(sp, rr(30, 46), rr(20, 27));
+      this.piece('rice', l.x, l.y, dirx * rr(40, 95), diry * rr(20, 60) + rr(-10, 25), 'wok');
+      if (i % 3 === 2 && !(await this.wait(24))) return;
+    }
+    if (!(await this.wait(160))) return;
+    this.sfx('sizzle'); this.flare = Math.max(this.flare, 0.5);
+    this.tween(sp, 'rot', sp.rot, 0.6, 220, EASE.inOut);
+    await this.tween(sp, 'alpha', 1, 0, 240);
+    sp.dead = true; await this.wait(260);
+  }
+  async shake_in(kind, o) {
+    const g = this.gen, ok = () => g === this.gen;
+    const sp = this.sprite(kind, DROP.x, DROP.y - 4, 42, o);
+    await this.enter(sp, o); if (!ok()) return;
+    await this.tween(sp, 'rot', 0, kind === 'salt' ? 2.6 : 0.5, 220, EASE.inOut); if (!ok()) return;
+    this.sfx('sparkle');
+    const base = sp.rot;
+    for (let i = 0; i < 9; i++) {
+      sp.rot = base + (i % 2 ? 0.22 : -0.22); sp.y = DROP.y - 4 + (i % 2 ? -3 : 3);
+      const m = this.spPoint(sp, 32, kind === 'salt' ? 16 : 30);
+      for (let k = 0; k < 5; k++) this.fxs.push({ type: 'grain', x: m.x + rr(-5, 5), y: m.y + rr(-3, 3), vx: rr(-30, 30), vy: rr(20, 80), t: 0, life: 1.2, size: rr(1.1, 2), col: '#FFFFFF', base: true });
+      if (!(await this.wait(62))) return;
+    }
+    sp.rot = base; sp.y = DROP.y - 4;
+    if (!(await this.wait(260))) return;
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      this.fxs.push({ type: 'star', x: WOK.cx + Math.cos(a) * 10, y: WOK.rimY + 4 + Math.sin(a) * 3, vx: Math.cos(a) * 95, vy: Math.sin(a) * 30 - 45, t: 0, life: 0.9, size: rr(3, 5), col: '#FFE7A8', base: true });
+    }
+    this.pieces.forEach(p => { if (p.home === 'wok') p.glint = 1; });
+    this.sfx('sparkle');
+    this.tween(sp, 'alpha', 1, 0, 260);
+    await this.wait(360); sp.dead = true;
+  }
+  async pourLiquid(kind, o) {
+    const g = this.gen, ok = () => g === this.gen;
+    const soy = kind === 'soy';
+    const sp = this.sprite(kind, DROP.x - 18, DROP.y - 6, 46, o);
+    await this.enter(sp, o); if (!ok()) return;
+    await this.tween(sp, 'rot', 0, soy ? 2.0 : 1.7, 300, EASE.inOut); if (!ok()) return;
+    this.sfx('pour');
+    const st = { kind, sp, t: 0, life: soy ? 0.8 : 1.0, col: GLAZE[kind], w: soy ? 2.6 : 4.4, lip: soy ? [32, 8] : [32, 19] };
+    this.streams.push(st);
+    if (!(await this.wait(st.life * 1000))) return;
+    await this.tween(sp, 'rot', sp.rot, 0, 240, EASE.inOut); if (!ok()) return;
+    await this.tween(sp, 'alpha', 1, 0, 200);
+    sp.dead = true;
+  }
+  oilBurst(x, y, n) {
+    for (let i = 0; i < n; i++) this.oil.push({ x: x + rr(-30, 30), y, vx: rr(-70, 70), vy: rr(-230, -90), t: 0, life: rr(0.3, 0.55), s: rr(0.9, 1.8) });
+  }
+
+  /* ---------------- heat, stirring ---------------- */
+  setHeat(on) { this.heatTarget = on ? 1 : 0; }
+  setCook(level) { this.cookTarget = Math.max(0, Math.min(1, level)); }
+  stirTo(a) { this.spat.on = true; this.spat.ta = a; }
+  stirStop() { this.spat.on = false; this.spat.auto = false; }
+  toss(strength = 1) {
+    if (this.reduce || this.t - this.lastToss < 0.34) return; this.lastToss = this.t;
+    if (!this.pieces.some(p => p.home === 'wok')) return;
+    this.sfx('toss'); this.shake = 1; this.flare = 1;
+    for (const p of this.pieces) {
+      if (p.home !== 'wok') continue;
+      p.vy = -rr(150, 280) * strength * (p.kind === 'bokchoy' ? 0.7 : 1); p.vx = rr(-50, 50) + (WOK.cx - p.x) * 0.9; p.vr = rr(-9, 9); p.grounded = false;
+    }
+    this.oilBurst(WOK.cx, WOK.rimY + 6, 6);
+  }
+  // Grandma's porthole mirrors Emma's stirring
+  remoteStir(level) {
+    if (level > this.rl + 0.004) { this.spat.on = true; this.spat.auto = true; this.spat.until = this.t + 0.8; }
+    this.rl = Math.max(this.rl, level);
+    this.setCook(0.3 + 0.7 * level);
+  }
+
+  /* ---------------- serving, tasting, reactions ---------------- */
+  async serve() {
+    const g = this.gen, ok = () => g === this.gen;
+    this.heatTarget = 0; this.stirStop();
+    if (this.reduce) { this.plateNow(); return; }
+    if (!this.mini) { this.plate.on = true; this.sfx('clink'); await this.tween(this.plate, 'k', 0, 1, 360, EASE.back); if (!ok()) return; }
+    const tilt = this.tweenWok(this.mini ? { dx: -14, dy: -20, rot: -0.62 } : { dx: -44, dy: -40, rot: -0.6 }, 440, EASE.inOut);
+    if (!(await this.wait(220))) return; this.sfx('pour');
+    const inWok = this.pieces.filter(p => p.home === 'wok').sort((a, b) => a.x - b.x);
+    const step = Math.max(6, Math.min(14, 520 / Math.max(1, inWok.length)));
+    inWok.forEach((p, i) => setTimeout(() => {
+      if (!ok() || p.home !== 'wok') return;
+      const w = this.poseXY(p.x, p.y); p.x = w.x; p.y = w.y; p.rot += this.wok.rot;
+      if (this.mini) { p.home = 'gone'; p.grounded = false; p.vx = rr(-170, -100); p.vy = rr(-200, -120); }
+      else { p.layer = rr(0, 9); this.launch(p, PLATE.cx + rr(-28, 28), PLATE.cy - 8 + rr(-3, 2), 'plate', rr(0.34, 0.46)); }
+    }, i * step));
+    await tilt; if (!ok()) return;
+    if (!(await this.wait(inWok.length * step + 360))) return;
+    await this.tweenWok({ dx: 0, dy: 0, rot: 0 }, 380, EASE.out);
+  }
+  plateNow() {
+    this.heatTarget = 0; this.heat = 0; this.stirStop(); this.wok = { dx: 0, dy: 0, rot: 0 };
+    if (this.mini) { this.pieces = []; return; }
+    this.plate.on = true; this.plate.k = 1;
+    for (const p of this.pieces) { p.home = 'plate'; p.layer = rr(0, 9); p.x = PLATE.cx + rr(-28, 28); p.grounded = true; p.y = this.floorY(p); p.cooked = Math.max(p.cooked, 0.9); }
+  }
+  launch(p, tx, ty, home, T) {
+    p.home = home; p.grounded = false;
+    p.vx = (tx - p.x) / T; p.vy = (ty - p.y) / T - 0.5 * COOK_G * p.gmul * T; p.vr = rr(-7, 7);
+  }
+  plateCount() { return this.pieces.filter(p => p.home === 'plate').length; }
+  async bite(mouth, share = 3.2) {
+    const on = this.pieces.filter(p => p.home === 'plate').sort((a, b) => a.x - b.x);
+    if (!on.length) return;
+    const take = on.slice(0, Math.max(2, Math.ceil(on.length / share)));
+    take.forEach((p, i) => {
+      p.home = 'mouth'; p.grounded = false; p.T = 0.24 + i * 0.01; p.tt = 0;
+      p.vx = (mouth.x - p.x) / p.T; p.vy = (mouth.y - p.y) / p.T - 0.5 * COOK_G * p.T; p.vr = rr(-8, 8);
+    });
+    if (!(await this.wait(280))) return;
+    const col = FOOD[take[0].kind] ? FOOD[take[0].kind].cooked : '#FFC63A';
+    for (let i = 0; i < 6; i++) this.fxs.push({ type: 'crumb', x: mouth.x + rr(4, 12), y: mouth.y + rr(-2, 4), vx: rr(10, 80), vy: rr(-110, -30), t: 0, life: rr(0.5, 0.8), size: rr(1.2, 2.2), col });
+  }
+  react(kind, at) {
+    const push = o => this.fxs.push(Object.assign({ t: 0, delay: 0 }, o));
+    const side = () => (Math.random() < 0.5 ? -1 : 1);
+    if (kind === 'yum') {
+      for (let i = 0; i < 8; i++) { const s = i % 2 ? 1 : -1; push({ type: 'heart', x: at.x + s * rr(48, 64), y: at.y + rr(10, 40), vx: s * rr(6, 18), vy: rr(-60, -38), life: rr(1.3, 1.8), size: rr(5, 8), col: i % 3 ? '#FF8E93' : '#FFB3B5', delay: i * 0.08 }); }
+      for (let i = 0; i < 12; i++) { const a = rr(0, Math.PI * 2); push({ type: 'star', x: at.x + Math.cos(a) * 52, y: at.y + 30 + Math.sin(a) * 46, vx: Math.cos(a) * 40, vy: Math.sin(a) * 40 - 20, life: rr(0.6, 1), size: rr(3, 5), col: '#FFD28E' }); }
+    } else if (kind === 'spicy') {
+      for (let i = 0; i < 6; i++) { const s = i % 2 ? 1 : -1; push({ type: 'flame', x: at.x + s * rr(44, 58), y: at.y + rr(28, 48), vx: s * rr(4, 12), vy: rr(-55, -35), life: rr(0.9, 1.3), size: rr(6, 9), delay: i * 0.08 }); }
+      for (let i = 0; i < 6; i++) { const s = i % 2 ? 1 : -1; push({ type: 'puff', x: at.x + s * 50, y: at.y + 20, vx: s * rr(25, 45), vy: rr(-45, -25), life: 1.1, size: rr(9, 13), delay: i * 0.14 }); }
+      for (let i = 0; i < 4; i++) push({ type: 'heart', x: at.x + side() * rr(46, 60), y: at.y + 30, vx: rr(-8, 8), vy: rr(-60, -45), life: 1.4, size: 6, col: '#FF6B5B', delay: 0.35 + i * 0.12 });
+    } else if (kind === 'odd') {
+      for (let i = 0; i < 3; i++) push({ type: 'q', x: at.x + 52 + i * 15, y: at.y + 26 - (i % 2) * 10, vx: 0, vy: -20, life: 1.7, size: 18 + (i % 2) * 5, delay: i * 0.2 });
+    } else if (kind === 'blehh') {
+      for (let i = 0; i < 4; i++) { const s = i % 2 ? 1 : -1; push({ type: 'stink', x: at.x + s * (48 + (i > 1 ? 12 : 0)), y: at.y + 34, vx: 0, vy: -32, life: 1.7, size: 16, delay: i * 0.14 }); }
+      for (let i = 0; i < 7; i++) push({ type: 'bubble', x: at.x + side() * rr(42, 60), y: at.y + rr(24, 50), vx: rr(-10, 10), vy: rr(-45, -22), life: rr(1, 1.5), size: rr(2.5, 4.5), delay: i * 0.09 });
+    }
+  }
+
+  /* ---------------- simulation ---------------- */
+  update(dt) {
+    this.t += dt;
+    for (let i = this.tweens.length - 1; i >= 0; i--) {
+      const tw = this.tweens[i]; tw.t += dt; const k = Math.min(1, tw.t / tw.d);
+      tw.obj[tw.key] = tw.from + (tw.to - tw.from) * tw.ease(k);
+      if (k >= 1) { this.tweens.splice(i, 1); tw.res(); }
+    }
+    const anyWok = this.pieces.some(p => p.home === 'wok') || this.pools.length > 0;
+    const target = anyWok ? this.heatTarget : 0;
+    this.heat += (target - this.heat) * Math.min(1, dt * 3);
+    this.flare *= Math.pow(0.05, dt); this.shake *= Math.pow(0.004, dt);
+    // spatula: auto (hold button, porthole) or following a finger
+    const sp = this.spat;
+    if (sp.auto) { sp.ta += dt * 7.5; if (this.t - this.lastToss > 0.6) this.toss(0.85); if (sp.until && this.t > sp.until) { sp.auto = false; sp.until = 0; } }
+    let da = sp.ta - sp.a; sp.a += da * Math.min(1, dt * 18);
+    const bx = WOK.cx + Math.cos(sp.a) * 40, by = WOK.rimY + 7 + Math.sin(sp.a) * 6;
+    if (sp.on && sp.bx != null) {
+      const vx = (bx - sp.bx) / Math.max(dt, 0.001), vy = (by - sp.by) / Math.max(dt, 0.001), v = Math.hypot(vx, vy);
+      if (v > 30) for (const p of this.pieces) {
+        if (p.home !== 'wok' || !p.grounded) continue;
+        if (Math.hypot(p.x - bx, p.y - by) < 16) { p.vx = Math.max(-80, Math.min(80, vx * 0.25)); p.vy = -rr(40, 95); p.grounded = false; p.vr += rr(-6, 6); }
+      }
+    }
+    sp.bx = bx; sp.by = by;
+    // food
+    for (let i = this.pieces.length - 1; i >= 0; i--) {
+      const p = this.pieces[i];
+      if (p.home === 'mouth') {
+        p.tt += dt; p.vy += COOK_G * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+        p.scale = Math.max(0.2, 1 - (p.tt / p.T) * 0.8);
+        if (p.tt >= p.T) this.pieces.splice(i, 1);
+        continue;
+      }
+      if (p.home === 'gone') { p.vy += COOK_G * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.alpha -= dt * 2.4; if (p.alpha <= 0) this.pieces.splice(i, 1); continue; }
+      if (!p.grounded) {
+        p.vy += COOK_G * p.gmul * dt;
+        if (p.sway) p.vx += Math.sin(this.t * 7 + p.seed) * 150 * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+        if (p.home === 'wok') {
+          const lim = WOK.rx - 12;
+          if (Math.abs(p.vx) > 120) p.vx = Math.sign(p.vx) * 120;
+          if (p.y > WOK.rimY - 4 && Math.abs(p.x - WOK.cx) > lim) { p.x = WOK.cx + Math.sign(p.x - WOK.cx) * lim; p.vx *= -0.35; }
+        } else if (p.home === 'plate') {
+          const lim = PLATE.rx - 9;
+          if (p.y > PLATE.cy - 14 && Math.abs(p.x - PLATE.cx) > lim) { p.x = PLATE.cx + Math.sign(p.x - PLATE.cx) * lim; p.vx *= -0.3; }
+        }
+        const fy = this.floorY(p);
+        if (p.vy > 0 && p.y >= fy) {
+          p.y = fy;
+          if (p.vy > 160) {
+            p.vy = -p.vy * 0.25; p.vx *= 0.55; p.vr *= 0.5;
+            if (p.home === 'wok' && this.heat > 0.3 && Math.random() < 0.3) this.oilBurst(p.x, p.y, 2);
+          } else { p.vy = 0; p.grounded = true; }
+        }
+      } else {
+        // resting: slide a little toward the middle; keep a bit of life while it sizzles
+        p.vx *= Math.pow(0.02, dt); p.vr *= Math.pow(0.02, dt);
+        p.x += p.vx * dt;
+        if (p.home === 'wok') { const off = p.x - WOK.cx, lim = 44; if (Math.abs(off) > lim) p.x -= (off - Math.sign(off) * lim) * Math.min(1, dt * 2.5); }
+        p.rot += p.vr * dt; p.y = this.floorY(p);
+        if (p.home === 'wok' && this.heat > 0.6 && Math.random() < dt * 0.5) { p.vy = -rr(25, 60); p.grounded = false; }
+      }
+      if (p.home === 'wok' && this.heat > 0.2) p.cooked += (this.cookTarget - p.cooked) * Math.min(1, dt * 1.2);
+      if (p.glint) p.glint = Math.max(0, p.glint - dt * 0.7);
+    }
+    for (const pl of this.pools) pl.t += dt;
+    for (let i = this.drops.length - 1; i >= 0; i--) {
+      const d = this.drops[i]; d.vy += COOK_G * dt; d.y += d.vy * dt; d.stretch = Math.min(0.6, d.vy / 900);
+      if (d.y >= WOK.rimY + 4) { this.drops.splice(i, 1); d.res(); }
+    }
+    for (let i = this.shells.length - 1; i >= 0; i--) {
+      const s = this.shells[i]; s.t += dt; s.vy += COOK_G * 0.8 * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.rot += s.vr * dt;
+      if (s.t > s.life) this.shells.splice(i, 1);
+    }
+    for (let i = this.slashes.length - 1; i >= 0; i--) { const s = this.slashes[i]; s.t += dt; if (s.t > 0.26) this.slashes.splice(i, 1); }
+    this.sprites = this.sprites.filter(s => !s.dead);
+    for (let i = this.streams.length - 1; i >= 0; i--) {
+      const st = this.streams[i]; st.t += dt;
+      const amt = st.kind === 'soy' ? 0.45 : 0.42;
+      this.pieces.forEach(p => { if (p.home === 'wok') { p.glaze = st.col; p.glazeAmt = Math.min(amt, p.glazeAmt + dt * 0.7); } });
+      if (Math.random() < dt * 20) this.oil.push({ x: WOK.cx + rr(-14, 14), y: WOK.rimY + 6, vx: rr(-40, 40), vy: rr(-120, -50), t: 0, life: 0.35, s: rr(1, 1.8), col: st.col });
+      if (st.t >= st.life) this.streams.splice(i, 1);
+    }
+    // little oil pops while it sizzles
+    if (this.heat > 0.5 && anyWok && Math.random() < dt * 7) this.oil.push({ x: WOK.cx + rr(-40, 40), y: WOK.rimY + rr(2, 10), vx: rr(-25, 25), vy: rr(-140, -70), t: 0, life: rr(0.25, 0.4), s: rr(0.8, 1.4) });
+    for (let i = this.oil.length - 1; i >= 0; i--) {
+      const o = this.oil[i]; o.t += dt; o.vy += COOK_G * 0.7 * dt; o.x += o.vx * dt; o.y += o.vy * dt;
+      if (o.t > o.life) this.oil.splice(i, 1);
+    }
+    // steam from the wok, then from the plate
+    const plateHot = this.plate.on && this.pieces.some(p => p.home === 'plate');
+    const rate = (anyWok ? 2.2 * this.heat : 0) + this.flare * 6 + (plateHot ? 1.6 : 0);
+    if (!this.reduce && Math.random() < rate * dt) {
+      const fromPlate = plateHot && (!anyWok || Math.random() < 0.5);
+      this.steam.push({ x: fromPlate ? PLATE.cx + rr(-26, 26) : WOK.cx + rr(-40, 40), y: fromPlate ? PLATE.cy - 12 : WOK.rimY - 2, t: 0, life: rr(1.5, 2.2), len: rr(16, 24), amp: rr(2.5, 4.5), ph: rr(0, 6), vy: rr(-30, -22) });
+    }
+    for (let i = this.steam.length - 1; i >= 0; i--) {
+      const s = this.steam[i]; s.t += dt; s.y += s.vy * dt;
+      if (s.t > s.life) this.steam.splice(i, 1);
+    }
+    for (let i = this.fxs.length - 1; i >= 0; i--) {
+      const f = this.fxs[i];
+      if (f.delay > 0) { f.delay -= dt; continue; }
+      f.t += dt;
+      if (f.type === 'grain') { f.vy += COOK_G * 0.55 * dt; if (f.y > WOK.rimY + 6) f.t = f.life; }
+      else if (f.type === 'crumb') f.vy += COOK_G * 0.7 * dt;
+      else if (f.type === 'star') { f.vx *= Math.pow(0.15, dt); f.vy *= Math.pow(0.15, dt); }
+      f.x += f.vx * dt + (f.type === 'heart' ? Math.sin(f.t * 5 + i) * 10 * dt : 0); f.y += f.vy * dt;
+      if (f.t >= f.life) this.fxs.splice(i, 1);
+    }
+  }
+
+  /* ---------------- drawing ---------------- */
+  setup(ctx, c) {
+    const dpr = c._dpr || 1, w = c._w || c.width / dpr, h = c._h || c.height / dpr, v = this.view;
+    let s, ox = 0, oy = 0;
+    if (this.mini) { s = Math.max(w / v.w, h / v.h); ox = (w - v.w * s) / 2; oy = (h - v.h * s) / 2; }
+    else s = w / v.w;
+    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * (ox - v.x * s), dpr * (oy - v.y * s));
+  }
+  draw() {
+    const c = this.cv, ctx = c && c.width ? c.getContext('2d') : null;
+    if (ctx) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, c.width, c.height);
+      this.setup(ctx, c);
+      if (this.mini) this.drawBackdrop(ctx);
+      this.drawStove(ctx);
+      this.drawWok(ctx, 'back');
+      this.drawWokFood(ctx);
+      this.drawWok(ctx, 'front');
+      if (this.spat.on) this.drawSpatula(ctx);
+      this.drawPlate(ctx);
+      this.drawLoose(ctx);
+      this.drawStreams(ctx); this.drawSprites(ctx); this.drawOil(ctx); this.drawFx(ctx, true); this.drawSteam(ctx);
+      if (!this.fx) { this.drawMouth(ctx); this.drawFx(ctx, false); }
+    }
+    const fc = this.fx, f = fc && fc.width ? fc.getContext('2d') : null;
+    if (f) {
+      f.setTransform(1, 0, 0, 1, 0, 0); f.clearRect(0, 0, fc.width, fc.height);
+      this.setup(f, fc); this.drawMouth(f); this.drawFx(f, false);
+    }
+  }
+  drawBackdrop(ctx) {
+    const v = this.view, x0 = v.x - 40, y0 = v.y - 40, x1 = v.x + v.w + 40, y1 = v.y + v.h + 40;
+    ctx.fillStyle = '#FFF0DA'; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+    ctx.save(); ctx.beginPath(); ctx.rect(176, y0, x1 - 176, 296 - y0); ctx.clip();
+    ctx.fillStyle = '#E5F0DF';
+    for (let x = 176; x < x1; x += 22) for (let y = 198; y < 296; y += 22) { rrect(ctx, x + 1, y + 1, 20, 20, 5); ctx.fill(); }
+    ctx.restore();
+    ctx.fillStyle = '#F8D7AB'; ctx.fillRect(x0, 310, x1 - x0, y1 - 310);
+    ctx.fillStyle = '#ECBB86'; ctx.strokeStyle = '#5B3A2E'; ctx.lineWidth = 2.6; rrect(ctx, x0 - 10, 292, x1 - x0 + 20, 20, 6); ctx.fill(); ctx.stroke();
+  }
+  pose(ctx) {
+    const sh = this.shake, wob = Math.sin(this.t * 38) * sh;
+    const px = WOK.cx, py = WOK.rimY + 20;
+    ctx.translate(px + this.wok.dx + wob * 5, py + this.wok.dy - Math.abs(wob) * 4);
+    ctx.rotate(this.wok.rot + wob * 0.05);
+    ctx.translate(-px, -py);
+  }
+  drawStove(ctx) {
+    const cx = WOK.cx, y = WOK.rimY + 57;
+    ctx.fillStyle = 'rgba(110,70,40,.16)'; ctx.beginPath(); ctx.ellipse(cx + 4, y + 4, STOVE_RX + 4, 8, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#5E5552'; ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 2.2;
+    rrect(ctx, cx - STOVE_RX, y - 5, STOVE_RX * 2, 10, 5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#7A706B'; rrect(ctx, cx - STOVE_RX + 4, y - 3.5, STOVE_RX * 2 - 8, 3, 1.5); ctx.fill();
+    // knob
+    ctx.fillStyle = '#E9654F'; ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(cx + STOVE_RX - 11, y + 0.5, 3, 0, 7); ctx.fill(); ctx.stroke();
+    // burner ring and the little supports the wok sits on
+    ctx.fillStyle = '#2E2624'; ctx.beginPath(); ctx.ellipse(cx, y - 5, 32, 3.2, 0, 0, 7); ctx.fill();
+    ctx.strokeStyle = '#2E2624'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (const dx of [-25, 0, 25]) { ctx.beginPath(); ctx.moveTo(cx + dx, y - 5); ctx.lineTo(cx + dx * 1.05, y - 13); ctx.stroke(); }
+    const h0 = this.heat * (1 + this.flare * 0.9);
+    if (h0 < 0.03) return;
+    for (let k = 0; k < 12; k++) {
+      const x = cx - 33 + (k / 11) * 66, yy = y - 5;
+      const fl = (10 + 4 * Math.sin(this.t * 22 + k * 1.9) + 2.4 * Math.sin(this.t * 13 + k)) * h0;
+      ctx.fillStyle = 'rgba(246,150,58,.92)'; flamePath(ctx, x, yy, 6.6, fl); ctx.fill();
+      ctx.fillStyle = 'rgba(255,226,122,.95)'; flamePath(ctx, x, yy, 3.2, fl * 0.55); ctx.fill();
+    }
+    // warm glow under the wok
+    const g = ctx.createRadialGradient(cx, y - 10, 2, cx, y - 10, 46);
+    g.addColorStop(0, `rgba(255,170,80,${0.32 * Math.min(1, h0)})`); g.addColorStop(1, 'rgba(255,170,80,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(cx, y - 10, 46, 16, 0, 0, 7); ctx.fill();
+  }
+  drawWok(ctx, part) {
+    const { cx, rimY, rx, ry } = WOK;
+    ctx.save(); this.pose(ctx);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if (part === 'back') {
+      // long wooden handle and the little loop handle
+      ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 9.5; ctx.beginPath(); ctx.moveTo(cx + rx - 6, rimY + 5); ctx.lineTo(cx + rx + 44, rimY - 6); ctx.stroke();
+      ctx.strokeStyle = '#C98E5A'; ctx.lineWidth = 6.4; ctx.beginPath(); ctx.moveTo(cx + rx + 8, rimY + 2); ctx.lineTo(cx + rx + 43.5, rimY - 5.8); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(cx + rx + 14, rimY - 0.6); ctx.lineTo(cx + rx + 40, rimY - 6.4); ctx.stroke();
+      ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 3.4; ctx.beginPath(); ctx.arc(cx - rx - 2, rimY + 6, 7, Math.PI * 0.6, Math.PI * 1.45); ctx.stroke();
+      // bowl
+      const g = ctx.createLinearGradient(0, rimY, 0, rimY + 46); g.addColorStop(0, '#6A605B'); g.addColorStop(1, '#3A322F');
+      ctx.fillStyle = g; ctx.strokeStyle = '#2E2624'; ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(cx - rx, rimY);
+      ctx.bezierCurveTo(cx - rx + 4, rimY + 30, cx - 36, rimY + 46, cx, rimY + 46);
+      ctx.bezierCurveTo(cx + 36, rimY + 46, cx + rx - 4, rimY + 30, cx + rx, rimY);
+      ctx.ellipse(cx, rimY, rx, ry, 0, 0, Math.PI, false);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.17)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx - rx + 13, rimY + 19); ctx.quadraticCurveTo(cx - 38, rimY + 39, cx - 14, rimY + 42); ctx.stroke();
+      // opening
+      const gi = ctx.createRadialGradient(cx, rimY + 4, 6, cx, rimY, rx);
+      gi.addColorStop(0, '#3B3230'); gi.addColorStop(1, '#211B19');
+      ctx.fillStyle = gi; ctx.beginPath(); ctx.ellipse(cx, rimY, rx - 2, ry - 1, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.09)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, rimY - 1, rx - 10, ry - 5, 0, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+      if (this.heat > 0.05) { ctx.fillStyle = `rgba(255,160,80,${0.1 * this.heat})`; ctx.beginPath(); ctx.ellipse(cx, rimY + 2, rx - 16, ry - 4, 0, 0, Math.PI * 2); ctx.fill(); }
+    } else {
+      ctx.strokeStyle = '#2E2624'; ctx.lineWidth = 2.6; ctx.beginPath(); ctx.ellipse(cx, rimY, rx, ry, 0, Math.PI, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = '#8F8580'; ctx.lineWidth = 3.4; ctx.beginPath(); ctx.ellipse(cx, rimY, rx - 1.5, ry - 1, 0, 0.04, Math.PI - 0.04); ctx.stroke();
+      ctx.strokeStyle = '#2E2624'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.ellipse(cx, rimY + 0.4, rx + 0.4, ry + 0.8, 0, 0.02, Math.PI - 0.02); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(cx, rimY - 0.6, rx - 3, ry - 2, 0, 0.35, 1.2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawWokFood(ctx) {
+    const list = this.pieces.filter(p => p.home === 'wok');
+    if (!list.length && !this.pools.length && !this.drops.length) return;
+    const { cx, rimY, rx, ry } = WOK;
+    ctx.save(); this.pose(ctx);
+    ctx.beginPath(); ctx.ellipse(cx, rimY, rx - 3, ry - 1.4, 0, 0, Math.PI * 2); ctx.rect(cx - 400, rimY - 400, 800, 400); ctx.clip();
+    if (list.length) {
+      // a glossy bed of oil and sauce under the food
+      const gl = list.find(p => p.glazeAmt > 0.05);
+      ctx.globalAlpha = 0.6; ctx.fillStyle = gl ? hexMix('#4A3B35', gl.glaze, 0.55) : '#4D3D36';
+      ctx.beginPath(); ctx.ellipse(cx, rimY + 4, rx - 16, ry - 5, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+    }
+    for (const pl of this.pools) this.drawPool(ctx, pl);
+    list.sort((a, b) => a.y - b.y);
+    for (const p of list) this.drawPiece(ctx, p);
+    for (const d of this.drops) this.drawDrop(ctx, d);
+    ctx.restore();
+  }
+  drawLoose(ctx) {
+    const list = this.pieces.filter(p => p.home === 'plate' || p.home === 'gone');
+    list.sort((a, b) => a.y - b.y);
+    for (const p of list) this.drawPiece(ctx, p);
+  }
+  drawMouth(ctx) { for (const p of this.pieces) if (p.home === 'mouth') this.drawPiece(ctx, p); }
+  drawPool(ctx, pl) {
+    const k = Math.min(1, pl.t / 0.12), rx = 24 * (0.6 + 0.4 * k), sq = 0.42;
+    ctx.save(); ctx.translate(pl.x, pl.y);
+    blob(ctx, rx, pl.sh, 0, 0, sq); ctx.fillStyle = '#FFFDF4'; ctx.fill(); ctx.strokeStyle = FOOD_LINE; ctx.lineWidth = 1; ctx.stroke();
+    // lacy brown edge starting to form
+    ctx.strokeStyle = `rgba(214,150,70,${0.5 * Math.min(1, pl.t / pl.life)})`; ctx.lineWidth = 2; blob(ctx, rx * 0.92, pl.sh, 0, 0, sq); ctx.stroke();
+    ctx.fillStyle = '#FFC93C'; ctx.strokeStyle = FOOD_LINE; ctx.beginPath(); ctx.ellipse(-2, -1.5, 6.2, 4.6, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.ellipse(-4, -3, 1.8, 1.2, 0, 0, 7); ctx.fill();
+    // bubbles
+    for (let i = 0; i < 5; i++) { const a = i * 1.3 + pl.t * 3, r = rx * 0.75; ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(Math.cos(a) * r, Math.sin(a) * r * sq, 1 + (i % 2), 0, 7); ctx.fill(); }
+    ctx.restore();
+  }
+  drawDrop(ctx, d) {
+    ctx.save(); ctx.translate(d.x, d.y); const st = 1 + d.stretch;
+    ctx.fillStyle = '#FFFBEC'; ctx.strokeStyle = FOOD_LINE; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(0, 0, 9 / st, 7.5 * st, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#FFC93C'; ctx.beginPath(); ctx.arc(0, 1.5, 4.6, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.arc(-1.4, 0, 1.3, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+  drawPiece(ctx, p) {
+    const f = FOOD[p.kind]; if (!f) return;
+    const t = p.cooked; let col = hexMix(f.raw, f.cooked, t);
+    if (p.glazeAmt > 0 && p.glaze) col = rgbMix(col, p.glaze, p.glazeAmt);
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); if (p.scale !== 1) ctx.scale(p.scale, p.scale); ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.lineWidth = 0.9; ctx.strokeStyle = FOOD_LINE; ctx.lineJoin = 'round';
+    const s = p.s;
+    switch (p.kind) {
+      case 'egg':
+        blob(ctx, s, p.shape); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+        ctx.globalAlpha *= 0.5 - 0.32 * t; blob(ctx, s * 0.5, p.shape, -s * 0.22, -s * 0.14); ctx.fillStyle = '#FFFBEA'; ctx.fill();
+        ctx.globalAlpha = p.alpha;
+        if (t > 0.45) { ctx.strokeStyle = `rgba(200,120,40,${Math.min(0.7, (t - 0.45) * 1.3)})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(0, 0, s * 0.78, 0.3, 1.7); ctx.stroke(); }
+        break;
+      case 'tomato':
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, s, -0.65, 0.65); ctx.closePath(); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(s * 0.18, 0); ctx.arc(0, 0, s * 0.72, -0.5, 0.5); ctx.closePath(); ctx.fillStyle = hexMix('#FF967D', f.cooked, 0.35 + t * 0.4); ctx.fill();
+        ctx.fillStyle = '#FFE3A0'; ctx.beginPath(); ctx.ellipse(s * 0.5, -s * 0.16, 1.1, 0.7, 0.3, 0, 7); ctx.ellipse(s * 0.52, s * 0.18, 1.1, 0.7, -0.3, 0, 7); ctx.fill();
+        if (t > 0.3) { ctx.strokeStyle = `rgba(255,255,255,${0.5 * t})`; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.arc(0, 0, s * 0.88, -0.45, -0.08); ctx.stroke(); }
+        break;
+      case 'rice':
+        ctx.strokeStyle = 'rgba(120,90,60,.6)'; ctx.lineWidth = 0.6; ctx.fillStyle = col;
+        for (let i = 0; i < p.shape.length; i += 3) {
+          ctx.beginPath(); ctx.ellipse(p.shape[i] * 6 - 3, p.shape[i + 1] * 4 - 2, 2.5, 1.4, p.shape[i + 2] * 3, 0, 7); ctx.fill(); ctx.stroke();
+        }
+        break;
+      case 'garlic':
+        rrect(ctx, -s / 2, -s / 2, s, s, s * 0.3); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = 'rgba(150,120,90,.7)'; ctx.lineWidth = 0.6; ctx.stroke(); break;
+      case 'bokchoy':
+        ctx.beginPath(); ctx.ellipse(0, -s * 0.25, s * 0.52, s * 0.8, 0, 0, 7); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+        rrect(ctx, -s * 0.17, s * 0.2, s * 0.34, s * 0.62, s * 0.12); ctx.fillStyle = hexMix('#F1F6E2', '#DDEBB8', t); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(0, s * 0.3); ctx.lineTo(0, -s * 0.85); ctx.stroke(); break;
+      case 'scallion':
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 7); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.45, 0, 7); ctx.fillStyle = '#E6F4D8'; ctx.fill(); break;
+      case 'chili':
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 7); ctx.fillStyle = col; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.55, 0, 7); ctx.fillStyle = '#FFB59A'; ctx.fill();
+        ctx.fillStyle = '#FFE7A0'; ctx.beginPath(); ctx.arc(-s * 0.2, 0, 0.8, 0, 7); ctx.arc(s * 0.2, 0.4, 0.8, 0, 7); ctx.fill(); break;
+      case 'cheese':
+        rrect(ctx, -s / 2, -s * 0.14 - t * 1.2, s * (1 - t * 0.15), s * 0.28 + t * 2.2, 1.6); ctx.fillStyle = col; ctx.fill(); ctx.stroke(); break;
+      case 'chocolate':
+        if (t < 0.5) { rrect(ctx, -s / 2, -s / 2, s, s, 1.4); ctx.fillStyle = col; ctx.fill(); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(-s / 2 + 1, -s / 2 + 1, s - 2, s * 0.28); }
+        else { blob(ctx, s * 0.8, p.shape); ctx.fillStyle = col; ctx.fill(); ctx.stroke(); }
+        break;
+    }
+    if (p.glint > 0) { ctx.globalAlpha = p.glint; ctx.fillStyle = '#FFFFFF'; ctx.translate(s * 0.3, -s * 0.4); starPath(ctx, 2.6); ctx.fill(); }
+    ctx.restore();
+  }
+  drawSpatula(ctx) {
+    const a = this.spat.a, bx = WOK.cx + Math.cos(a) * 40, by = WOK.rimY + 7 + Math.sin(a) * 6;
+    const hx = bx + 30 + Math.cos(a) * 6, hy = by - 62, ang = Math.atan2(hy - by, hx - bx);
+    ctx.save(); this.pose(ctx); ctx.lineCap = 'round';
+    ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(bx + Math.cos(ang) * 8, by + Math.sin(ang) * 8); ctx.lineTo(hx, hy); ctx.stroke();
+    ctx.strokeStyle = '#C98E5A'; ctx.lineWidth = 4.4; ctx.beginPath(); ctx.moveTo(bx + Math.cos(ang) * 10, by + Math.sin(ang) * 10); ctx.lineTo(hx, hy); ctx.stroke();
+    const px = Math.cos(ang + Math.PI / 2), py = Math.sin(ang + Math.PI / 2);
+    ctx.beginPath(); ctx.moveTo(bx - px * 9, by - py * 9); ctx.lineTo(bx + px * 9, by + py * 9);
+    ctx.lineTo(bx + px * 7 + Math.cos(ang) * 11, by + py * 7 + Math.sin(ang) * 11); ctx.lineTo(bx - px * 7 + Math.cos(ang) * 11, by - py * 7 + Math.sin(ang) * 11); ctx.closePath();
+    ctx.fillStyle = '#E2E7EA'; ctx.strokeStyle = '#3A302D'; ctx.lineWidth = 1.6; ctx.lineJoin = 'round'; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+  drawPlate(ctx) {
+    if (!this.plate.on || this.mini) return;
+    const k = Math.max(0.01, this.plate.k), { cx, cy, rx, ry } = PLATE;
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(k, k);
+    ctx.fillStyle = 'rgba(110,70,40,.18)'; ctx.beginPath(); ctx.ellipse(3, 6, rx + 2, ry + 3, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#FFFDF8'; ctx.strokeStyle = '#5B3A2E'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.setLineDash([1, 4.6]); ctx.lineCap = 'round'; ctx.strokeStyle = '#9DBFE3'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.ellipse(0, -0.5, rx * 0.84, ry * 0.74, 0, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#F4EEE4'; ctx.beginPath(); ctx.ellipse(0, -0.6, rx * 0.68, ry * 0.58, 0, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+  drawStreams(ctx) {
+    for (const st of this.streams) {
+      const m = this.spPoint(st.sp, st.lip[0], st.lip[1]);
+      const tx = WOK.cx - 4, ty = WOK.rimY + 6;
+      const fade = Math.min(1, st.t / 0.1) * Math.min(1, (st.life - st.t) / 0.15 + 0.15);
+      ctx.save(); ctx.globalAlpha = Math.max(0, fade); ctx.strokeStyle = st.col; ctx.lineCap = 'round'; ctx.lineWidth = st.w;
+      ctx.beginPath(); ctx.moveTo(m.x, m.y);
+      ctx.quadraticCurveTo(m.x + 10 + Math.sin(this.t * 18) * 1.5, m.y + (ty - m.y) * 0.3, tx + Math.sin(this.t * 25) * 1.2, ty); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = Math.max(0.8, st.w * 0.28); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  drawSprites(ctx) {
+    for (const s of this.sprites) {
+      const img = IMG[s.name]; if (!img || !img.complete || !img.naturalWidth) continue;
+      ctx.save(); ctx.globalAlpha = Math.max(0, s.alpha);
+      const wob = s.wob ? Math.sin(this.t * 40) * 0.12 : 0;
+      ctx.translate(s.x, s.y); ctx.rotate(s.rot + wob); ctx.scale(s.k, s.k);
+      ctx.drawImage(img, -s.size / 2, -s.size / 2, s.size, s.size);
+      if (s.crack) { ctx.strokeStyle = '#5B3A2E'; ctx.lineWidth = 1.7; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(-10, 1); ctx.lineTo(-5, -3); ctx.lineTo(-1, 2); ctx.lineTo(3, -3); ctx.lineTo(7, 2); ctx.lineTo(10, -1); ctx.stroke(); }
+      ctx.restore();
+    }
+    for (const s of this.shells) {
+      ctx.save(); ctx.globalAlpha = Math.max(0, 1 - s.t / s.life); ctx.translate(s.x, s.y); ctx.rotate(s.rot);
+      ctx.fillStyle = '#F6E0C3'; ctx.strokeStyle = '#5B3A2E'; ctx.lineWidth = 1.6; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.ellipse(0, 0, 9, 12, 0, s.side < 0 ? Math.PI * 0.5 : -Math.PI * 0.5, s.side < 0 ? Math.PI * 1.5 : Math.PI * 0.5);
+      ctx.lineTo(s.side * -1.5, -6); ctx.lineTo(s.side * 2, -2); ctx.lineTo(s.side * -1.5, 2); ctx.lineTo(s.side * 2, 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+    for (const s of this.slashes) {
+      const a = 1 - s.t / 0.26; ctx.save(); ctx.globalAlpha = a; ctx.lineCap = 'round';
+      ctx.translate(s.x, s.y); ctx.rotate(s.a);
+      ctx.strokeStyle = 'rgba(91,58,46,.35)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-28 * (1 - a * 0.3), 0); ctx.lineTo(28, 0); ctx.stroke();
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.restore();
+    }
+  }
+  drawOil(ctx) {
+    for (const o of this.oil) {
+      ctx.globalAlpha = Math.max(0, 1 - o.t / o.life); ctx.fillStyle = o.col || '#FFF3C4';
+      ctx.beginPath(); ctx.arc(o.x, o.y, o.s, 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  drawSteam(ctx) {
+    ctx.lineCap = 'round';
+    for (const s of this.steam) {
+      const k = s.t / s.life, a = Math.sin(Math.PI * k);
+      const pts = []; for (let i = 0; i <= 6; i++) { const u = i / 6; pts.push([s.x + Math.sin(s.ph + this.t * 2.4 + u * 4) * s.amp * (0.5 + k), s.y - u * s.len * (0.7 + k * 0.6)]); }
+      const path = () => {
+        ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length - 1; i++) ctx.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+        ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+      };
+      ctx.globalAlpha = a * 0.14; ctx.strokeStyle = '#B98C66'; ctx.lineWidth = 7; path(); ctx.stroke();
+      ctx.globalAlpha = a * 0.85; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 4.4; path(); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  drawFx(ctx, base) {
+    for (const f of this.fxs) {
+      if (!!f.base !== base || f.delay > 0) continue;
+      const k = f.t / f.life, a = Math.max(0, Math.min(1, k < 0.15 ? k / 0.15 : (1 - k) / 0.5));
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(f.x, f.y);
+      const pop = k < 0.2 ? EASE.back(k / 0.2) : 1;
+      if (f.type === 'heart') { ctx.scale(pop, pop); heartPath(ctx, f.size); ctx.fillStyle = f.col; ctx.fill(); ctx.strokeStyle = '#5B3A2E'; ctx.lineWidth = 1; ctx.stroke(); }
+      else if (f.type === 'star') { ctx.rotate(f.t * 3); starPath(ctx, f.size); ctx.fillStyle = f.col; ctx.fill(); }
+      else if (f.type === 'grain') { ctx.fillStyle = f.col; ctx.strokeStyle = 'rgba(150,120,90,.5)'; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.arc(0, 0, f.size, 0, 7); ctx.fill(); ctx.stroke(); }
+      else if (f.type === 'crumb') { ctx.fillStyle = f.col; ctx.beginPath(); ctx.arc(0, 0, f.size, 0, 7); ctx.fill(); }
+      else if (f.type === 'flame') { ctx.scale(pop, pop); ctx.fillStyle = 'rgba(244,92,58,.95)'; flamePath(ctx, 0, f.size, f.size * 1.1, f.size * 2.2); ctx.fill(); ctx.fillStyle = 'rgba(255,214,110,.95)'; flamePath(ctx, 0, f.size, f.size * 0.55, f.size * 1.3); ctx.fill(); }
+      else if (f.type === 'puff') { const r = f.size * (1 + k); ctx.globalAlpha = a * 0.85; ctx.fillStyle = '#FFFFFF'; ctx.strokeStyle = 'rgba(185,140,102,.35)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.arc(r * 0.8, r * 0.3, r * 0.7, 0, 7); ctx.fill(); }
+      else if (f.type === 'q') { ctx.scale(pop, pop); ctx.font = `700 ${f.size}px Fredoka, Nunito, sans-serif`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.fillStyle = '#5B3A2E'; ctx.strokeStyle = '#FFFDF8'; ctx.lineWidth = 4; ctx.strokeText('?', 0, 0); ctx.fillText('?', 0, 0); }
+      else if (f.type === 'stink') { ctx.strokeStyle = 'rgba(112,160,72,.9)'; ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.beginPath(); for (let i = 0; i <= 12; i++) { const yy = -i * 1.6, xx = Math.sin(i * 0.9 + f.t * 6) * 3.5; i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); } ctx.stroke(); }
+      else if (f.type === 'bubble') { ctx.strokeStyle = 'rgba(100,160,72,.9)'; ctx.fillStyle = 'rgba(190,227,180,.6)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(0, 0, f.size, 0, 7); ctx.fill(); ctx.stroke(); }
+      ctx.restore();
+    }
+  }
+}
+
 /* ---- app.js ---- */
 /* ============================================================
    PIP app: one phone's experience (Grandma or Emma)
@@ -1441,6 +2201,12 @@ class Sfx {
         case 'blehh': this.tone(420, 0.45, 'sawtooth', 0.05, 0, 130); this.tone(300, 0.3, 'square', 0.03, 0.12, 110); break;
         case 'ding': this.tone(880, 0.18, 'sine', 0.1); this.tone(1320, 0.26, 'sine', 0.08, 0.1); break;
         case 'chew': this.noise(0.06, 0.06, 700, 'bandpass', 0); this.noise(0.06, 0.06, 650, 'bandpass', 0.18); this.noise(0.06, 0.06, 700, 'bandpass', 0.36); break;
+        case 'crack': this.noise(0.05, 0.16, 2600, 'bandpass'); this.tone(1500, 0.04, 'square', 0.025); this.noise(0.04, 0.1, 3200, 'bandpass', 0.06); break;
+        case 'chop': this.tone(190, 0.07, 'sine', 0.16, 0, 90); this.noise(0.04, 0.1, 1900, 'bandpass'); break;
+        case 'pour': this.noise(0.55, 0.035, 1500, 'lowpass'); this.noise(0.45, 0.02, 3800, 'bandpass', 0.08); break;
+        case 'toss': this.noise(0.3, 0.05, 3600, 'highpass'); this.tone(150, 0.12, 'sine', 0.06, 0, 85); break;
+        case 'clink': this.tone(1900, 0.3, 'sine', 0.06); this.tone(2850, 0.22, 'sine', 0.035, 0.015); break;
+        case 'shutter': this.noise(0.035, 0.14, 2800, 'bandpass'); this.noise(0.05, 0.1, 2000, 'bandpass', 0.09); break;
       }
     } catch (e) { }
   }
@@ -1452,8 +2218,8 @@ function speak(text, lang) {
     const s = window.speechSynthesis; if (!s || !window.SpeechSynthesisUtterance) return false;
     s.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang === 'zh' ? 'zh-CN' : 'en-US'; u.rate = lang === 'zh' ? 0.9 : 1;
-    const v = (s.getVoices() || []).find(x => x.lang && x.lang.toLowerCase().indexOf(lang === 'zh' ? 'zh' : 'en') === 0);
+    u.lang = 'en-US'; u.rate = 0.95;
+    const v = (s.getVoices() || []).find(x => x.lang && x.lang.toLowerCase().indexOf('en') === 0);
     if (v) u.voice = v;
     s.speak(u); return true;
   } catch (e) { return false; }
@@ -1467,8 +2233,8 @@ function pipMarkup(expr = 'idle', cls = '') {
 function miniPip(expr = 'idle', cls = '') {
   return `<span class="mini-pip ${cls}" aria-hidden="true"><span class="mp-body" style="background-image:url(${Art.fluff()})"></span>${Art.face(expr)}</span>`;
 }
-function fmtDate(ms, lang) {
-  try { return new Intl.DateTimeFormat(lang === 'zh' ? 'zh-CN' : 'en-US', { month: lang === 'zh' ? 'numeric' : 'short', day: 'numeric' }).format(new Date(ms || Date.now())); }
+function fmtDate(ms) {
+  try { return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(ms || Date.now())); }
   catch (e) { return ''; }
 }
 
@@ -1477,8 +2243,9 @@ class PipApp {
   constructor(root, { role, sync, split, onSwitch, shareUrl, room }) {
     this.id = 'p' + (++APP_SEQ);
     this.root = root; this.role = role; this.split = !!split; this.onSwitch = onSwitch; this.shareUrl = shareUrl; this.roomCode = room;
-    const defaults = role === 'grandma' ? { lang: 'zh', mode: 'easy' } : { lang: 'en', mode: 'standard' };
+    const defaults = role === 'grandma' ? { mode: 'easy' } : { mode: 'standard' };
     this.prefs = Object.assign(defaults, lsGet('pip-prefs-' + role, {}));
+    this.prefs.lang = 'en'; // the demo runs in English throughout
     this.local = { gScreen: 'home', laterSaid: false, overlay: null, overlayArg: null };
     this.stir = 0; this.lastPres = 0; this.seenWave = {}; this.savedMoment = {}; this.timers = [];
     this.view = derive(null, null); this.shown = null; this.live = false;
@@ -1501,6 +2268,7 @@ class PipApp {
   destroy() {
     if (this.unsub) this.unsub();
     if (this.ro) this.ro.disconnect();
+    if (this.cook) this.cook.stop(); if (this.mini) this.mini.stop();
     this.timers.forEach(clearTimeout); clearInterval(this.holdTimer);
     this.root.innerHTML = '';
   }
@@ -1525,9 +2293,8 @@ class PipApp {
       <main class="stage" data-stage>
         <div class="world" data-world>
           <div class="scene-wrap" data-scene></div>
-          <div class="wok" data-wok hidden></div>
-          <div class="steam-wrap" data-steam hidden>${Art.steam}</div>
-          <div class="plate" data-plate hidden></div>
+          <canvas class="cook-cv" data-cook aria-hidden="true" hidden></canvas>
+          <div class="wok-hit" data-hit hidden><span class="drop-ring" aria-hidden="true"></span><svg class="stir-guide" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true"><ellipse cx="100" cy="30" rx="97" ry="27"/></svg></div>
           <div class="pip-actor" data-pip>
             <div class="pip-mover" data-mover>
               <div class="carry" data-carry></div>
@@ -1536,6 +2303,7 @@ class PipApp {
             <div class="bubble" data-bubble hidden></div>
           </div>
           <div class="away" data-away hidden></div>
+          <canvas class="fx-cv" data-fx aria-hidden="true"></canvas>
         </div>
         <div class="porthole" data-port hidden></div>
         <div class="photo" data-photo hidden></div>
@@ -1550,18 +2318,22 @@ class PipApp {
     const q = s => r.querySelector(s);
     this.el = {
       app: q('.app'), st: q('[data-st]'), partner: q('[data-partner]'), banner: q('[data-banner]'), toasts: q('[data-toasts]'),
-      stage: q('[data-stage]'), world: q('[data-world]'), scene: q('[data-scene]'), wok: q('[data-wok]'), steam: q('[data-steam]'),
-      plate: q('[data-plate]'), pip: q('[data-pip]'), mover: q('[data-mover]'), carry: q('[data-carry]'), bubble: q('[data-bubble]'),
+      stage: q('[data-stage]'), world: q('[data-world]'), scene: q('[data-scene]'), cookCv: q('[data-cook]'), fxCv: q('[data-fx]'), hit: q('[data-hit]'),
+      pip: q('[data-pip]'), mover: q('[data-mover]'), carry: q('[data-carry]'), bubble: q('[data-bubble]'),
       away: q('[data-away]'), port: q('[data-port]'), photo: q('[data-photo]'), ribbon: q('[data-ribbon]'), panel: q('[data-panel]'),
       overlay: q('[data-overlay]'), announce: q('[data-announce]'), snd: q('[data-act="sound"]'), menu: q('[data-act="menu"]')
     };
     this.applyPrefs();
+    // the cooking stage: Emma's stove and wok, plus effects drawn above PIP on both phones
+    const play = n => SFX.play(n);
+    this.cook = new CookStage(this.role === 'emma' ? this.el.cookCv : null, this.el.fxCv, { sfx: play });
     // keep the illustrated world covering the stage (like background-size: cover)
     const fit = () => {
       const s = this.el.stage.getBoundingClientRect();
       this.el.world.style.setProperty('--stage-h', s.height + 'px');
       this.el.world.style.width = Math.min(Math.max(s.width, s.height * 390 / 420), s.width * 1.08) + 'px';
       this.placeBubble(); this.placePort();
+      if (this.cook) this.cook.resize();
     };
     fit();
     if (window.ResizeObserver) { this.ro = new ResizeObserver(fit); this.ro.observe(this.el.stage); }
@@ -1573,7 +2345,7 @@ class PipApp {
   applyPrefs() {
     const a = this.el.app;
     a.classList.toggle('mode-easy', this.prefs.mode === 'easy'); a.classList.toggle('mode-standard', this.prefs.mode !== 'easy');
-    a.setAttribute('lang', this.prefs.lang === 'zh' ? 'zh-CN' : 'en');
+    a.setAttribute('lang', 'en');
     this.el.menu.setAttribute('aria-label', this.t('menu'));
     this.renderSound();
   }
@@ -1625,7 +2397,7 @@ class PipApp {
     const scene = this.sceneOf(v);
     const sceneKey = scene + (scene === 'home' ? ':' + Math.min(this.hub.moments.length, 5) : '');
     if (sceneKey !== this.sceneKey) { this.sceneKey = sceneKey; this.setScene(scene, live && prev && this.sceneOf(prev) !== scene); }
-    this.renderWok(v); this.renderRibbon(v); this.renderPort(v); this.renderPanel(v, prev);
+    this.renderCook(v, live); this.renderRibbon(v); this.renderPort(v, live); this.renderPanel(v, prev);
     // PIP travels between the two phones
     const here = this.pipHere(v);
     const wasHere = this.pipHereShown;
@@ -1653,8 +2425,8 @@ class PipApp {
   }
 
   refreshLive(v) {
-    // presence-only changes: stirring progress, partner status
-    if (v.phase === 'stir') { this.renderPort(v); if (this.role === 'grandma') this.renderServeState(v); }
+    // presence-only changes: what Emma is adding right now, stirring progress, partner status
+    if (this.role === 'grandma') { this.renderPort(v, true); if (v.phase === 'stir') this.renderServeState(v); }
     this.renderTop();
   }
 
@@ -1686,7 +2458,7 @@ class PipApp {
     const L = this.prefs.lang;
     if (this.role === 'emma') {
       if (p.phase === 'pick1' && v.phase === 'add1') this.say(this.t('t_g_chose', { ing: ingName(v.order[0], L) }));
-      if (v.reply && v.reply !== p.reply) { this.toast(this.t('t_g_reply', { r: REPLIES[v.reply].zh + (L === 'en' ? ' · ' + REPLIES[v.reply].en : '') }), Art.icon('heart', 'ti')); SFX.play('ding'); }
+      if (v.reply && v.reply !== p.reply) { this.toast(this.t('t_g_reply', { r: '“' + REPLIES[v.reply].en + '”' }), Art.icon('heart', 'ti')); SFX.play('ding'); }
     } else {
       if ((p.phase === 'invited' || p.phase === 'declined') && v.phase === 'pick1') { this.say(this.t('t_e_joined')); SFX.play('ding'); }
       if (p.phase === 'add1' && v.phase === 'pick2') this.say(this.t('t_e_added', { ing: ingName(p.order[0], L) }));
@@ -1723,7 +2495,7 @@ class PipApp {
     const scene = this.sceneOf(v);
     let x = 44, y = 13.5, w = 30;
     if (scene === 'kitchen') { x = this.role === 'emma' ? 24 : 30; y = 27.6; w = 29; }
-    if (v.phase === 'done' && this.role === 'emma') x = 31;
+    if (v.phase === 'done' && this.role === 'emma') x = 25;
     const p = this.el.pip.style;
     p.setProperty('--x', x + '%'); p.setProperty('--y', y + '%'); p.setProperty('--w', w + '%');
   }
@@ -1800,7 +2572,8 @@ class PipApp {
   squish() { const m = this.el.mover; if (reduceMotion()) return; m.animate([{ transform: 'scale(1.12,.88)' }, { transform: 'scale(.96,1.05)' }, { transform: 'scale(1,1)' }], { duration: 380, easing: 'ease-out' }); }
   renderAway(v) {
     const here = this.pipHere(v);
-    const show = !here && v.phase !== 'idle';
+    // on Grandma's phone the porthole already shows where PIP is helping
+    const show = !here && v.phase !== 'idle' && !(this.role === 'grandma' && !this.el.port.hidden);
     this.el.away.hidden = !show;
     if (show) {
       const key = 'away' + this.prefs.lang;
@@ -1822,11 +2595,11 @@ class PipApp {
       else if (ph === 'pick2') text = this.t('pick2_bubble', { ing: ingName(v.order[1], L) });
     } else {
       if (ph === 'idle') text = this.t('e_home_bubble');
-      else if (ph === 'add1') { text = this.t('g_says_first', { ing: cap(ingName(v.order[0], L)) }); if (L === 'en') lines.push(`奶奶：“先放${ingName(v.order[0], 'zh')}！”`); }
+      else if (ph === 'add1') { text = this.t('g_says_first', { ing: cap(ingName(v.order[0], L)) }); if (ING[v.order[0]].hint) lines.push(ING[v.order[0]].hint); }
       else if (ph === 'add2' && v.sub === 'add') { text = this.t('next_is', { ing: cap(ingName(v.order[1], L)) }); lines.push(v.secret === 'none' ? this.t('no_secret') : this.t('secret_is', { s: ingName(v.secret, L) })); }
       else if (ph === 'add2') text = this.t('secret_is', { s: ingName(v.secret, L) });
-      else if (ph === 'twist') text = L === 'zh' ? '轮到你啦！' : 'Your turn!';
-      else if (ph === 'stir') text = v.stirred ? (L === 'zh' ? '好香呀！' : 'Smells so good!') : (L === 'zh' ? '快炒快炒！' : 'Stir, stir, stir!');
+      else if (ph === 'twist') text = this.t('twist_bubble');
+      else if (ph === 'stir') text = v.stirred ? this.t('stirred_bubble') : this.t('stir_bubble');
     }
     if (!text) return this.hideBubble();
     const b = this.el.bubble;
@@ -1847,29 +2620,42 @@ class PipApp {
     else if (br.right > sr.right - 10) dx = sr.right - 10 - br.right;
     b.style.setProperty('--bx', Math.round(dx) + 'px');
   }
-  renderWok(v) {
-    const kitchen = this.sceneOf(v) === 'kitchen' && this.role === 'emma' && v.phase !== 'done';
-    this.el.wok.hidden = !kitchen;
-    this.el.steam.hidden = !(kitchen && (v.phase === 'stir' || (v.added && v.added.length && v.phase !== 'done')));
-    if (!kitchen) return;
-    const items = this.wokItems(v);
-    const key = items.join(',');
-    if (this.el.wok.dataset.v !== key) {
-      const rot = this.el.wok.style.getPropertyValue('--rot');
-      this.el.wok.dataset.v = key;
-      this.el.wok.innerHTML = Art.wok(items) + `<span class="drop-ring" aria-hidden="true"></span>`;
-      if (rot) this.el.wok.style.setProperty('--rot', rot);
-    }
-    this.el.wok.classList.toggle('stirring', v.phase === 'stir' && !v.stirred && this.prefs.mode !== 'easy');
-    this.el.wok.classList.toggle('hot', !!(v.added && v.added.length) && v.phase !== 'done');
-  }
-  wokItems(v) {
+  /* ---------------- the cooking stage (Emma's stove and wok) ---------------- */
+  cookItems(v) {
     const it = [];
     if (!v.order) return it;
     (v.added || []).forEach(a => it.push(a));
     if (v.secret && v.secret !== 'none' && v.secretIn) it.push(v.secret);
     if (v.twist && v.twist !== 'none') it.push(v.twist);
     return it;
+  }
+  cookPhase(v) { return ['pick1', 'add1', 'pick2', 'add2', 'twist', 'stir', 'done'].includes(v.phase); }
+  renderCook(v, live) {
+    if (this.role !== 'emma') return;
+    const c = this.cook, on = this.sceneOf(v) === 'kitchen' && this.cookPhase(v);
+    const cv = this.el.cookCv, hit = this.el.hit;
+    if (cv.hidden === on) { cv.hidden = !on; hit.hidden = !on; if (on) c.resize(); }
+    if (!on) { if (c.items.size || c.plate.on) c.clear(); c.stop(); this.cookKey = null; hit.classList.remove('stirring'); return; }
+    c.start();
+    const key = v.sid + ':' + v.round;
+    if (this.cookKey !== key) { this.cookKey = key; c.clear(); this.stirAcc = 0; }
+    if (v.phase === 'done') {
+      // the serving show runs in phaseEffects; opened part-way, just plate it up
+      if (!live || this.tasted === key) { c.ensure(this.cookItems(v), false); if (!c.plate.on) c.plateNow(); }
+      hit.classList.remove('stirring');
+      return;
+    }
+    c.ensure(this.cookItems(v), false);
+    c.setHeat(!!(v.added && v.added.length));
+    c.setCook(v.phase === 'stir' ? (v.stirred ? 1 : 0.3 + 0.7 * this.stir) : 0.3);
+    if (v.phase !== 'stir' || v.stirred) c.stirStop();
+    hit.classList.toggle('stirring', v.phase === 'stir' && !v.stirred && this.prefs.mode !== 'easy');
+  }
+  worldToClient(x, y) { const wr = this.el.world.getBoundingClientRect(), s = wr.width / 390; return { x: wr.left + x * s, y: wr.top + y * s, s }; }
+  pipPoint(fx, fy) {
+    // a point inside PIP's box, in world units
+    const wr = this.el.world.getBoundingClientRect(), pr = this.el.pip.getBoundingClientRect(), s = 390 / Math.max(1, wr.width);
+    return { x: (pr.left - wr.left + pr.width * fx) * s, y: (pr.top - wr.top + pr.height * fy) * s };
   }
 
   /* ---------------- ribbon: whose turn it is ---------------- */
@@ -1878,7 +2664,7 @@ class PipApp {
     this.el.ribbon.hidden = !cooking;
     if (!cooking) return;
     const L = this.prefs.lang;
-    const html = `<ol class="steps-row" aria-label="${L === 'zh' ? '步骤' : 'Steps'}">` + STEPS.map((s, i) => {
+    const html = `<ol class="steps-row" aria-label="${esc(this.t('steps'))}">` + STEPS.map((s, i) => {
       const state = v.step > i ? 'done' : v.step === i ? 'now' : 'todo';
       const who = s.who === 'grandma' ? this.t('avatar_grandma') : this.t('avatar_emma');
       return `<li class="${state} who-${s.who}" ${state === 'now' ? 'aria-current="step"' : ''}><span class="node">${state === 'done' ? '✓' : esc(who)}</span><span class="lbl">${esc(s[L])}</span></li>`;
@@ -1887,22 +2673,59 @@ class PipApp {
   }
 
   /* ---------------- porthole: a window into the other kitchen ---------------- */
-  renderPort(v) {
-    const p = this.el.port; const ph = v.phase; const L = this.prefs.lang;
-    let html = '';
-    if (this.role === 'grandma' && ['add1', 'add2', 'twist', 'stir'].includes(ph)) {
-      const pres = this.hub.peerPresence('emma');
-      let prog = v.stirred ? 1 : 0;
-      if (ph === 'stir' && pres && pres.sid === v.sid && pres.round === v.round && typeof pres.stir === 'number') prog = Math.max(prog, Math.min(1, pres.stir));
-      const deg = Math.round(prog * 360);
-      html = `<div class="port-ring" style="--deg:${ph === 'stir' ? deg : 0}deg"><div class="port-in">${Art.wok(this.wokItems(v))}</div></div><span class="port-lbl">${L === 'zh' ? 'Emma 的锅' : 'Emma’s wok'}${ph === 'stir' ? ` · ${Math.round(prog * 100)}%` : ''}</span>`;
-    } else if (this.role === 'emma' && (ph === 'pick1' || ph === 'pick2')) {
-      html = `<div class="port-ring calm"><div class="port-in g">${miniPip('curious', 'port-pip')}<span class="av av-grandma big" aria-hidden="true">${esc(this.t('avatar_grandma'))}</span></div></div><span class="port-lbl">${L === 'zh' ? '奶奶在选' : 'Grandma is choosing'}<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></span>`;
-    }
-    p.hidden = !html;
+  renderPort(v, live) {
+    const p = this.el.port, ph = v.phase;
+    const serving = this.portHold || (ph === 'done' && live && this.tasted !== v.sid + ':' + v.round);
+    let mode = null;
+    if (this.role === 'grandma' && (['add1', 'add2', 'twist', 'stir'].includes(ph) || serving)) mode = 'wok';
+    else if (this.role === 'emma' && (ph === 'pick1' || ph === 'pick2')) mode = 'g';
+    p.hidden = !mode;
     p.classList.toggle('center', this.role === 'grandma');
-    if (html && p.dataset.v !== html) { p.dataset.v = html; p.innerHTML = html; }
+    if (!mode) {
+      if (this.mini && !this.cookPhase(v)) { this.mini.stop(); this.mini.clear(); this.miniKey = null; }
+      return;
+    }
+    if (p.dataset.mode !== mode) {
+      p.dataset.mode = mode;
+      if (mode === 'wok') {
+        p.innerHTML = `<div class="port-ring" data-ring><div class="port-in w"><canvas class="port-cv" aria-hidden="true"></canvas><span class="flash" aria-hidden="true"></span></div></div><span class="port-lbl">${miniPip('happy')}<span data-pl></span></span>`;
+        this.mini = new CookStage(p.querySelector('canvas'), null, { mini: true });
+        this.miniKey = null;
+      } else {
+        p.innerHTML = `<div class="port-ring calm"><div class="port-in g">${miniPip('curious', 'port-pip')}<span class="av av-grandma big" aria-hidden="true">${esc(this.t('avatar_grandma'))}</span></div></div><span class="port-lbl">${esc(this.t('port_g'))}<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></span>`;
+      }
+    }
     this.placePort();
+    if (mode === 'wok') this.portCook(v, live);
+  }
+  remoteStirLevel(v) {
+    const pres = this.hub.peerPresence('emma');
+    let prog = v.stirred ? 1 : 0;
+    if (v.phase === 'stir' && pres && pres.sid === v.sid && pres.round === v.round && typeof pres.stir === 'number') prog = Math.max(prog, Math.min(1, pres.stir));
+    return prog;
+  }
+  portCook(v, live) {
+    const m = this.mini, p = this.el.port, ph = v.phase;
+    const key = v.sid + ':' + v.round, pres = this.hub.peerPresence('emma');
+    const mine = pres && pres.sid === v.sid && pres.round === v.round;
+    if (this.miniKey !== key) { this.miniKey = key; m.clear(); this.seenAdd = mine && pres.addAt || 0; }
+    m.start();
+    if (this.portHold) return; // the serving show is playing
+    // live: play what Emma is putting in right now (her taps arrive as presence)
+    if (mine && pres.addK && pres.addAt && pres.addAt !== this.seenAdd) {
+      this.seenAdd = pres.addAt;
+      if (!m.items.has(pres.addK)) { m.setHeat(true); m.add(pres.addK); }
+    }
+    const items = this.cookItems(v);
+    m.ensure(items, !!live && this.live);
+    m.setHeat(items.length > 0 || m.items.size > 0);
+    const prog = this.remoteStirLevel(v);
+    if (ph === 'stir') { if (v.stirred) { m.setCook(1); m.stirStop(); } else m.remoteStir(prog); }
+    else m.setCook(0.3);
+    const ring = p.querySelector('[data-ring]'), lbl = p.querySelector('[data-pl]');
+    if (ring) ring.style.setProperty('--deg', (ph === 'stir' ? Math.round(prog * 360) : 0) + 'deg');
+    const txt = this.t('port_e') + (ph === 'stir' ? ` · ${Math.round(prog * 100)}%` : '');
+    if (lbl && lbl.textContent !== txt) lbl.textContent = txt;
   }
   placePort() {
     const p = this.el.port; if (!p || p.hidden) return;
@@ -1914,6 +2737,7 @@ class PipApp {
     const size = Math.max(78, Math.min(want, avail - label));
     ring.style.width = size + 'px';
     p.style.top = Math.round(topSafe + Math.max(0, (avail - size - label) / 2)) + 'px';
+    if (this.mini && p.dataset.mode === 'wok') this.mini.resize();
   }
 
   /* ---------------- bottom sheet panels ---------------- */
@@ -1941,7 +2765,7 @@ class PipApp {
   }
   dishChip(dish) {
     const L = this.prefs.lang;
-    return `<div class="dish-chip">${Art.dish(dish)}<div><b>${esc(DISHES[dish].short[L])}</b>${L === 'en' ? `<span lang="zh-CN">${esc(DISHES[dish].zh)}</span>` : ''}</div></div>`;
+    return `<div class="dish-chip">${Art.dish(dish)}<div><b>${esc(DISHES[dish].short[L])}</b><span>${esc(DISHES[dish].desc)}</span></div></div>`;
   }
   panelGrandma(v) {
     const L = this.prefs.lang, ph = v.phase, n = this.hub.moments.length;
@@ -1949,22 +2773,22 @@ class PipApp {
     if (ph === 'idle') {
       if (this.local.gScreen === 'dishes') {
         return this.head(this.t('choose_dish')) + `<div class="dish-list">` + DISH_ORDER.map(k =>
-          `<button type="button" class="dish-card" data-act="g-dish" data-arg="${k}">${Art.dish(k)}<span><b>${esc(dishName(k, L))}</b>${L === 'zh' ? `<small lang="en">${esc(DISHES[k].en)}</small>` : `<small lang="zh-CN">${esc(DISHES[k].zh)}</small>`}</span></button>`).join('') +
+          `<button type="button" class="dish-card" data-act="g-dish" data-arg="${k}">${Art.dish(k)}<span><b>${esc(dishName(k, L))}</b><small>${esc(DISHES[k].desc)}</small></span></button>`).join('') +
           `</div><div class="row-actions">${this.btn(this.t('back'), 'g-back', { cls: 'ghost' })}</div>`;
       }
       return this.head(this.t('g_home_title'), this.t('g_home_sub')) +
         `<div class="col-actions">${this.btn(this.t('yes_teach'), 'g-yes', { cls: 'primary big', icon: Art.icon('envelope', 'bi') })}${this.btn(this.t('later'), 'g-later', { cls: 'soft big' })}</div>` +
-        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'ghost', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave'), 'wave', { cls: 'ghost', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'ghost', icon: Art.icon('heart', 'bi') })}${this.btn(this.t(this.role === 'emma' ? 'wave_to_g' : 'wave_to_e'), 'wave', { cls: 'ghost', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited') return this.head(this.t('waiting_t'), null, dots) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
     if (ph === 'declined') return this.head(this.t('declined_t'), this.t('declined')) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
     if (ph === 'pick1') {
       return this.head(this.t('pick1_t'), this.t('your_way')) + `<div class="tiles two">` +
-        DISHES[v.dish].core.map(k => this.tile(Art.icon(k), cap(ingName(k, L)), 'g-first', k, L === 'zh' ? ING[k].en : ING[k].zh)).join('') + `</div>`;
+        DISHES[v.dish].core.map(k => this.tile(Art.icon(k), cap(ingName(k, L)), 'g-first', k)).join('') + `</div>`;
     }
     if (ph === 'add1') return this.head(this.t('sent_t'), this.t('e_adding', { ing: ingName(v.order[0], L) })) + this.feed(v);
     if (ph === 'pick2') {
-      return this.head(this.t('pick2_t') + ' 🤫', L === 'zh' ? `接下来放${ingName(v.order[1], 'zh')}。` : `Next is the ${ingName(v.order[1], 'en')}.`) + `<div class="tiles three">` +
+      return this.head(this.t('pick2_t') + ' 🤫', this.t('pick2_sub', { ing: ingName(v.order[1], L) })) + `<div class="tiles three">` +
         DISHES[v.dish].secrets.map(k => this.tile(Art.icon(k), ING[k].tile[L], 'g-secret', k)).join('') + `</div>`;
     }
     if (['add2', 'twist', 'stir'].includes(ph)) {
@@ -2011,13 +2835,13 @@ class PipApp {
     const dots = `<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>`;
     if (ph === 'idle') {
       return this.head(this.t('e_home_title'), this.t('e_home_sub')) +
-        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t(this.role === 'emma' ? 'wave_to_g' : 'wave_to_e'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited' || ph === 'declined') {
       return this.head(this.t('open_title'), this.t('open_sub')) + this.dishChip(v.dish) +
         `<div class="col-actions">${this.btn(this.t('joinNow'), 'e-join', { cls: 'primary big' })}</div>`;
     }
-    const lesson = `<p class="eyebrow">${esc(this.t('lesson', { dish: DISHES[v.dish].short[L] }))}${L === 'en' ? ` · <span lang="zh-CN">${esc('奶奶的' + DISHES[v.dish].zh)}</span>` : ''}</p>`;
+    const lesson = `<p class="eyebrow">${esc(this.t('lesson', { dish: DISHES[v.dish].short[L] }))}</p>`;
     if (ph === 'pick1') return lesson + this.head(this.t('wait_first_t'), this.t('wait_first'), dots);
     if (ph === 'pick2') return lesson + this.head(this.t('wait_secret_t'), this.t('wait_secret'), dots);
     if (ph === 'add1' || (ph === 'add2' && v.sub === 'add')) {
@@ -2046,36 +2870,55 @@ class PipApp {
 
   /* ---------------- phase effects (tasting, photo) ---------------- */
   async phaseEffects(prev, v, live) {
-    if (v.phase !== 'done') { this.el.plate.hidden = true; this.el.photo.hidden = true; return; }
+    if (v.phase !== 'done') { this.el.photo.hidden = true; return; }
     const key = v.sid + ':' + v.round;
     if (this.tasted === key) return;
     this.tasted = key;
-    if (!live) return; // opened mid-way: go straight to the card
+    if (!live) return; // opened part-way: go straight to the card
     const L = this.prefs.lang, rx = REACT[v.outcome];
+    const say = t => { const b = this.el.bubble; b.hidden = false; b.dataset.v = ''; b.innerHTML = `<p>${esc(t)}</p>`; this.placeBubble(); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); };
     if (this.role === 'emma') {
-      SFX.play('pop');
-      this.el.plate.innerHTML = Art.dish(v.dish, v.twist !== 'none' ? v.twist : null);
-      this.el.plate.hidden = false; this.el.plate.classList.remove('in'); void this.el.plate.offsetWidth; this.el.plate.classList.add('in');
-      this.el.bubble.hidden = false; this.el.bubble.innerHTML = `<p>${esc(this.t('served'))}</p>`;
-      await sleep(900);
-      this.setExpression('chew'); this.el.mover.classList.add('chewing'); SFX.play('chew');
-      this.el.bubble.innerHTML = `<p>${esc(this.t('tasting'))}</p>`;
-      await sleep(1300);
-      this.el.mover.classList.remove('chewing');
-      this.setExpression(rx.face);
-      this.el.bubble.innerHTML = `<p>${esc(rx[L])}</p>`;
-      this.el.mover.classList.remove('wiggle', 'shake'); void this.el.mover.offsetWidth;
-      this.el.mover.classList.add(v.outcome === 'blehh' ? 'shake' : 'wiggle');
+      const c = this.cook, mover = this.el.mover;
+      SFX.play('ding'); this.setExpression('surprised'); say(this.t('served'));
+      await c.serve();
+      await sleep(160);
+      // PIP leans over the plate and takes a few bites
+      say(this.t('tasting'));
+      const bites = v.outcome === 'blehh' ? 1 : v.outcome === 'odd' ? 2 : 3;
+      const lean = reduceMotion() ? null : mover.animate([{ transform: 'none' }, { transform: 'translateX(6%) rotate(7deg)' }], { duration: 260, easing: 'ease-out', fill: 'forwards' });
+      for (let i = 0; i < bites; i++) {
+        this.setExpression('surprised');
+        await sleep(i ? 120 : 260);
+        const m = this.pipPoint(0.5, 0.58); m.x += 12;
+        await c.bite(m, bites === 1 ? 2.6 : 3.2);
+        this.setExpression('chew'); mover.classList.add('chewing'); SFX.play('chew'); haptic(10);
+        await sleep(560);
+        mover.classList.remove('chewing');
+      }
+      if (lean) lean.cancel();
+      this.setExpression(rx.face); say(rx[L]);
+      mover.classList.remove('wiggle', 'shake'); void mover.offsetWidth;
+      mover.classList.add(v.outcome === 'blehh' ? 'shake' : 'wiggle');
+      c.react(v.outcome, this.pipPoint(0.5, 0.05));
       SFX.play(v.outcome === 'blehh' ? 'blehh' : 'yum'); haptic(v.outcome === 'blehh' ? 60 : 20);
-      await sleep(1700);
+      await sleep(2000);
     } else {
-      // Grandma: PIP hops home with a photo of the dish
+      // Grandma watches Emma plate it up in the porthole; PIP snaps a photo and brings it home
+      this.portHold = true; this.renderPort(v, true);
+      const m = this.mini, port = this.el.port;
+      if (m && !port.hidden) {
+        m.ensure(this.cookItems(v), false);
+        await m.serve();
+        const fl = port.querySelector('.flash'); if (fl) { fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go'); }
+        SFX.play('shutter'); await sleep(320);
+      }
+      this.portHold = false; this.renderPort(v, true);
       this.el.photo.innerHTML = `<div class="polaroid">${Art.dish(v.dish, v.twist !== 'none' ? v.twist : null)}${pipMarkup(rx.face, 'ph-pip')}<p>${esc(rx[L])}</p></div>`;
       this.el.photo.hidden = false; this.el.photo.classList.remove('in'); void this.el.photo.offsetWidth; this.el.photo.classList.add('in');
       SFX.play(v.outcome === 'blehh' ? 'blehh' : 'yum');
-      await sleep(2600);
+      await sleep(2500);
     }
-    this.el.plate.hidden = true; this.el.photo.hidden = true;
+    this.el.photo.hidden = true;
   }
 
   /* ---------------- overlays: invitation, keepsake card, moments, settings, about ---------------- */
@@ -2132,8 +2975,8 @@ class PipApp {
     const blehh = m.outcome === 'blehh';
     const title = this.t('card_title', { dish: d.short[L] });
     const note = !blehh && m.outcome !== 'odd' && SECRET_NOTE[m.secret] ? ' ' + SECRET_NOTE[m.secret][L] : '';
-    const thanks = m.thanks ? `<div class="msg from-e"><span class="av av-emma" aria-hidden="true">E</span><p>${esc(L === 'zh' ? this.t('e_thanked') : '“' + STR.en.e_thanks + '”')}</p></div>` : '';
-    const reply = m.reply && REPLIES[m.reply] ? `<div class="msg from-g"><span class="av av-grandma" aria-hidden="true">奶</span><p><span lang="zh-CN">${esc(REPLIES[m.reply].zh)}</span>${L === 'en' ? ` <small>“${esc(REPLIES[m.reply].en)}”</small>` : ''}</p></div>` : '';
+    const thanks = m.thanks ? `<div class="msg from-e"><span class="av av-emma" aria-hidden="true">E</span><p>“${esc(this.t('e_thanks'))}”</p></div>` : '';
+    const reply = m.reply && REPLIES[m.reply] ? `<div class="msg from-g"><span class="av av-grandma" aria-hidden="true">G</span><p>“${esc(REPLIES[m.reply].en)}”</p></div>` : '';
     const id = this.id + '-ct';
     let actions = '';
     if (liveCard) {
@@ -2141,7 +2984,7 @@ class PipApp {
         actions = m.thanks ? `<p class="sent-note">💛 ${esc(this.t('thanked'))}${m.reply ? '' : ' · ' + esc(this.t('g_wait_reply'))}</p>` : this.btn(this.t('thank'), 'e-thank', { cls: 'primary big', icon: Art.icon('heart', 'bi') });
       } else {
         actions = m.reply ? `<p class="sent-note">✓ ${esc(this.t('replied'))}</p>` :
-          `<p class="reply-t">${esc(this.t('reply_t'))}</p><div class="reply-row">${REPLY_ORDER.map(k => `<button type="button" class="btn chip" data-act="g-reply" data-arg="${k}"><span lang="zh-CN">${esc(REPLIES[k].zh)}</span></button>`).join('')}</div>`;
+          `<p class="reply-t">${esc(this.t('reply_t'))}</p><div class="reply-row">${REPLY_ORDER.map(k => `<button type="button" class="btn chip" data-act="g-reply" data-arg="${k}"><span>${esc(REPLIES[k].en)}</span></button>`).join('')}</div>`;
       }
       actions += `<div class="row-actions">${this.btn(this.t('cook_again'), 'again', { cls: blehh ? 'primary' : 'soft' })}${this.btn(this.t('back_home'), 'end', { cls: 'ghost' })}</div>`;
     } else actions = `<div class="row-actions">${this.btn(this.t('close'), 'close', { cls: 'soft' })}</div>`;
@@ -2152,7 +2995,7 @@ class PipApp {
           <h2 id="${id}" tabindex="-1" data-autofocus>${esc(title)}</h2>
           <p class="kmeta">${esc(this.t('card_meta', { date: fmtDate(m.createdAt, L) }))}${m.round > 1 ? ' · ' + esc(this.t('attempt', { n: m.round })) : ''}</p>
           <ul class="kcontrib">
-            <li><span class="av av-grandma" aria-hidden="true">奶</span><div><b>${esc(this.t('c_g'))}</b><span>${esc(this.t('c_way', { a: ingName(m.first, L), b: ingName(m.second, L) }))}</span><span>${esc(m.secret && m.secret !== 'none' ? this.t('c_secret', { s: ingName(m.secret, L) }) : this.t('c_nosecret'))}</span></div></li>
+            <li><span class="av av-grandma" aria-hidden="true">G</span><div><b>${esc(this.t('c_g'))}</b><span>${esc(this.t('c_way', { a: ingName(m.first, L), b: ingName(m.second, L) }))}</span><span>${esc(m.secret && m.secret !== 'none' ? this.t('c_secret', { s: ingName(m.secret, L) }) : this.t('c_nosecret'))}</span></div></li>
             <li><span class="av av-emma" aria-hidden="true">E</span><div><b>${esc(this.t('c_e'))}</b><span>${esc(this.t('c_cooked'))}</span><span>${esc(m.twist && m.twist !== 'none' ? this.t('c_twist', { t: ingName(m.twist, L) }) : this.t('c_notwist'))}</span></div></li>
           </ul>
           <p class="kpip">${miniPip(rx.face)}<span><b>${esc(this.t('pip_says'))}</b> “${esc(rx[L] + note)}”</span></p>
@@ -2170,7 +3013,7 @@ class PipApp {
         <h2 id="${id}" tabindex="-1" data-autofocus>${esc(this.t('inv_title'))}</h2>
         <p class="kmeta">${esc(this.t('inv_lesson'))}</p>
         ${this.dishChip(v.dish)}
-        <p class="letter-quote"><span class="av av-grandma" aria-hidden="true">奶</span><span lang="zh-CN">“Emma，来，奶奶教你做${esc(DISHES[v.dish].zh)}！”</span></p>
+        <p class="letter-quote"><span class="av av-grandma" aria-hidden="true">G</span><span>“${esc(this.t('inv_quote', { dish: DISHES[v.dish].short[L] }))}”</span></p>
       </article>
       <div class="kactions"><div class="col-actions">${this.btn(this.t('join'), 'e-join', { cls: 'primary big' })}${this.btn(this.t('notNow'), 'e-decline', { cls: 'ghost' })}</div></div>
     </div>`;
@@ -2192,7 +3035,6 @@ class PipApp {
     const stl = this.el.st.textContent;
     return `<div class="modal sheet-modal" role="dialog" aria-modal="true" aria-labelledby="${id}">
       <div class="mhead"><h2 id="${id}" tabindex="-1" data-autofocus>${esc(this.t('settings'))}</h2>${this.btn(this.t('close'), 'close', { cls: 'ghost sm' })}</div>
-      <div class="setrow"><span>${esc(this.t('language'))}</span>${seg('lang', P.lang, [['zh', '中文'], ['en', 'English']])}</div>
       <div class="setrow"><span>${esc(this.t('mode'))}</span>${seg('mode', P.mode, [['easy', this.t('easy')], ['standard', this.t('standard')]])}</div>
       <div class="setrow"><span>${esc(this.t('sound'))}</span>${seg('sound', SFX.on ? 'on' : 'off', [['on', this.t('on')], ['off', this.t('off')]])}</div>
       <div class="setrow"><span>${esc(this.t('sync_status'))}</span><b class="stv">${esc(stl)}</b></div>
@@ -2209,12 +3051,13 @@ class PipApp {
   aboutHTML() {
     const id = this.id + '-ab';
     return `<div class="modal sheet-modal" role="dialog" aria-modal="true" aria-labelledby="${id}">
-      <div class="mhead"><h2 id="${id}" tabindex="-1" data-autofocus>About this demo · 关于演示</h2>${this.btn(this.t('close'), 'close', { cls: 'ghost sm' })}</div>
+      <div class="mhead"><h2 id="${id}" tabindex="-1" data-autofocus>About this demo</h2>${this.btn(this.t('close'), 'close', { cls: 'ghost sm' })}</div>
       <div class="about" lang="en">
         <h3>Built and working</h3>
         <ul><li>${typeof PIP_BUILD !== 'undefined' && PIP_BUILD === 'web' ? 'Two phones share one PIP and one cooking session in real time, with no sign-up: updates travel through free public MQTT message servers. Messages only carry dish choices and taps, no personal data.' : 'Two phones share one PIP and one cooking session in real time (Claude artifact database + live room).'}</li>
         <li>Grandma leads: she invites, picks the dish, the order and her secret, and decides when it is ready. Emma cooks, adds a twist, stirs and says thank you.</li>
-        <li>Easy and Standard modes, English and 中文, chosen per phone, all acting on the same shared state.</li>
+        <li>Every step of the cooking is animated live: Grandma watches Emma’s wok through a little window on her phone, and PIP tastes the dish on Emma’s.</li>
+        <li>Easy and Standard modes, chosen per phone, both acting on the same shared state.</li>
         <li>Keepsake cards in “Our Little Moments”, saved for both phones.</li></ul>
         <h3>Preset for the demo</h3>
         <ul><li>Grandma’s three dishes, her secrets and reply phrases are preset. In the product, the family adds her own recipes and sayings.</li>
@@ -2225,11 +3068,7 @@ class PipApp {
         <ul><li>PIP is based on our team’s own sketch. Illustrations are drawn in code for this demo.</li>
         <li>Fonts: Fredoka and Nunito (Google Fonts, SIL OFL). ${typeof PIP_BUILD !== 'undefined' && PIP_BUILD === 'web' ? 'Libraries: MQTT.js and qrcode-generator (MIT). ' : ''}Built with help from Claude (AI) for code.</li></ul>
       </div>
-      <div class="about" lang="zh-CN">
-        <h3>已实现</h3><ul><li>两台手机实时共享同一个 PIP 和同一次做菜；奶奶主导：邀请、选菜、定顺序、加秘方、决定出锅。</li><li>简单 / 标准模式、中文 / English 每台手机自己选，作用于同一个共享状态。</li></ul>
-        <h3>演示预设</h3><ul><li>三道菜、秘方和回复语是预设的；真实产品里由家人添加奶奶自己的菜和口头禅。</li></ul>
-        <h3>构想中</h3><ul><li>语音回答、桌面小组件、视频通话和其他活动。</li></ul>
-      </div></div>`;
+      </div>`;
   }
 
   /* ---------------- input ---------------- */
@@ -2329,19 +3168,35 @@ class PipApp {
     this.flyPromise = a.finished.catch(() => { }).then(() => { clone.remove(); this.setCarry(name); this.squish(); });
   }
   async waitIdle() { let n = 0; while (this.running && n++ < 60) await sleep(50); }
-  async dropIntoWok(fromRect, name) {
-    const wok = this.el.wok.getBoundingClientRect();
+  busyPanel(on) {
+    this.el.panel.classList.toggle('busy', on);
+    this.el.panel.querySelectorAll('button').forEach(b => { if (on) { if (!b.disabled) { b.disabled = true; b.dataset.busy = '1'; } } else if (b.dataset.busy) { b.disabled = false; delete b.dataset.busy; } });
+  }
+  /* the ingredient flies from PIP (or a tile) to just above the wok; the cooking stage takes it from there */
+  async flyToWok(fromRect, name) {
+    const to = this.worldToClient(DROP.x, DROP.y), size = 44 * to.s;
     const node = document.createElement('div'); node.className = 'flyer'; node.innerHTML = Art.icon(name);
-    const size = Math.max(40, fromRect.width);
-    Object.assign(node.style, { left: fromRect.left + 'px', top: fromRect.top + 'px', width: size + 'px', height: size + 'px' });
+    Object.assign(node.style, { left: (to.x - size / 2) + 'px', top: (to.y - size / 2) + 'px', width: size + 'px', height: size + 'px' });
     document.body.appendChild(node);
-    const dx = wok.left + wok.width * 0.47 - (fromRect.left + size / 2), dy = wok.top + wok.height * 0.22 - (fromRect.top + size / 2);
     if (!reduceMotion()) {
-      await node.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx * 0.6}px, ${dy - 60}px) scale(.9) rotate(20deg)` }, { transform: `translate(${dx}px, ${dy}px) scale(.35) rotate(40deg)`, opacity: 0.4 }], { duration: 520, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' }).finished.catch(() => { });
+      SFX.play('pop');
+      const sx = fromRect.left + fromRect.width / 2 - to.x, sy = fromRect.top + fromRect.height / 2 - to.y, s0 = Math.max(0.5, fromRect.width / size);
+      await node.animate([
+        { transform: `translate(${sx}px, ${sy}px) scale(${s0})` },
+        { transform: `translate(${sx * 0.45}px, ${Math.min(sy, 0) * 0.45 - 46}px) scale(${(s0 + 1) / 2}) rotate(-10deg)`, offset: 0.55 },
+        { transform: 'translate(0px, 0px) scale(1) rotate(0deg)' }
+      ], { duration: 460, easing: 'cubic-bezier(.35,.7,.4,1)', fill: 'forwards' }).finished.catch(() => { });
     }
     node.remove();
-    SFX.play('plop'); this.later(() => SFX.play('sizzle'), 120); haptic(25);
-    this.el.wok.classList.remove('bump'); void this.el.wok.offsetWidth; this.el.wok.classList.add('bump');
+  }
+  async cookIn(k, v) {
+    // tell Grandma's porthole right away, so both phones watch it go in together
+    this.sync.setPresence({ addK: k, addAt: Date.now(), sid: v.sid, round: v.round });
+    this.cook.setHeat(true); haptic(20);
+    if (this.pipHereShown) this.setExpression('surprised');
+    await this.cook.add(k, { handoff: true });
+    if (this.pipHereShown) { this.setExpression('joy'); this.squish(); }
+    await sleep(260);
   }
   async addToWok(name, fromRect) {
     if (this.adding) return; this.adding = true;
@@ -2350,11 +3205,13 @@ class PipApp {
       const v = this.view; const R = v.round || 1;
       if (!(v.phase === 'add1' || (v.phase === 'add2' && v.sub === 'add'))) return;
       const ing = v.phase === 'add1' ? v.order[0] : v.order[1];
+      this.busyPanel(true);
       const rect = fromRect || this.el.carry.getBoundingClientRect();
-      this.setCarry(null);
-      await this.dropIntoWok(rect, ing);
+      this.setCarry(null); this.hideBubble();
+      await this.flyToWok(rect, ing);
+      await this.cookIn(ing, v);
       this.sync.update(d => { if (!d.r || d.r.round !== R) d.r = { round: R }; const a = Array.isArray(d.r.added) ? d.r.added : []; if (!a.includes(ing)) a.push(ing); d.r.added = a; return d; });
-    } finally { this.adding = false; }
+    } finally { this.adding = false; this.busyPanel(false); }
   }
   async sprinkle() {
     if (this.adding) return; this.adding = true;
@@ -2362,44 +3219,50 @@ class PipApp {
       await this.waitIdle();
       const v = this.view; const R = v.round || 1;
       if (!(v.phase === 'add2' && v.sub === 'sprinkle')) return;
+      this.busyPanel(true);
       const rect = this.el.carry.getBoundingClientRect();
-      this.setCarry(null); SFX.play('sparkle');
-      await this.dropIntoWok(rect, v.secret);
+      this.setCarry(null); this.hideBubble();
+      await this.flyToWok(rect, v.secret);
+      await this.cookIn(v.secret, v);
       this.sync.update(d => { if (!d.r || d.r.round !== R) d.r = { round: R }; d.r.secretIn = true; return d; });
-    } finally { this.adding = false; }
+    } finally { this.adding = false; this.busyPanel(false); }
   }
   async addTwist(k, btn) {
     if (this.adding) return; this.adding = true;
     try {
       const v = this.view; const R = v.round || 1;
       if (v.phase !== 'twist') return;
-      if (k !== 'none') { const icon = btn.querySelector('svg'); await this.dropIntoWok(icon ? icon.getBoundingClientRect() : btn.getBoundingClientRect(), k); }
-      else SFX.play('pop');
-      this.stir = 0;
+      this.busyPanel(true);
+      if (k !== 'none') {
+        const icon = btn.querySelector('svg'); this.hideBubble();
+        await this.flyToWok(icon ? icon.getBoundingClientRect() : btn.getBoundingClientRect(), k);
+        await this.cookIn(k, v);
+      } else { SFX.play('pop'); this.setExpression('happy'); }
+      this.stir = 0; this.stirSent = null;
       this.sync.update(d => { if (!d.r || d.r.round !== R) d.r = { round: R }; d.r.twist = k; return d; });
-    } finally { this.adding = false; }
+    } finally { this.adding = false; this.busyPanel(false); }
   }
   /* drag the ingredient from PIP into the wok (Standard mode) */
   setupDrag() {
-    const carry = this.el.carry;
+    const carry = this.el.carry, hitEl = this.el.hit;
     let ghost = null, start = null, over = false, pid = null;
-    const wokHit = (x, y) => { const r = this.el.wok.getBoundingClientRect(); return x > r.left - 20 && x < r.right + 20 && y > r.top - 40 && y < r.bottom + 10; };
+    const wokHit = (x, y) => { const r = hitEl.getBoundingClientRect(); return r.width > 0 && x > r.left - 10 && x < r.right + 10 && y > r.top - 20 && y < r.bottom + 10; };
     carry.addEventListener('pointerdown', e => {
       if (!carry.classList.contains('grab') || this.adding) return;
       e.preventDefault(); pid = e.pointerId; try { carry.setPointerCapture(pid); } catch (er) { }
       const r = carry.getBoundingClientRect(); start = { x: e.clientX, y: e.clientY, r };
       ghost = document.createElement('div'); ghost.className = 'flyer drag'; ghost.innerHTML = carry.innerHTML;
       Object.assign(ghost.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
-      document.body.appendChild(ghost); carry.style.visibility = 'hidden'; this.el.wok.classList.add('target');
+      document.body.appendChild(ghost); carry.style.visibility = 'hidden'; hitEl.classList.add('target');
     });
     carry.addEventListener('pointermove', e => {
       if (!ghost || e.pointerId !== pid) return;
       ghost.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px) scale(1.12) rotate(-6deg)`;
-      const o = wokHit(e.clientX, e.clientY); if (o !== over) { over = o; this.el.wok.classList.toggle('over', o); }
+      const o = wokHit(e.clientX, e.clientY); if (o !== over) { over = o; hitEl.classList.toggle('over', o); }
     });
     const end = e => {
       if (!ghost || (e && e.pointerId !== pid)) return;
-      const g = ghost; ghost = null; this.el.wok.classList.remove('target', 'over');
+      const g = ghost; ghost = null; hitEl.classList.remove('target', 'over');
       const hit = e && wokHit(e.clientX, e.clientY); over = false;
       if (hit) {
         const r = g.getBoundingClientRect(); g.remove(); carry.style.visibility = '';
@@ -2410,46 +3273,48 @@ class PipApp {
     };
     carry.addEventListener('pointerup', end); carry.addEventListener('pointercancel', end);
   }
-  /* stir: circle around the wok (Standard) or hold the button (any mode) */
+  /* stir: circle a finger around the wok (Standard) or hold the button (any mode) */
   setupStir() {
-    const wok = this.el.wok; let last = null, pid = null;
-    const angle = (e) => { const r = wok.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height * 0.42), e.clientX - (r.left + r.width * 0.47)); };
-    wok.addEventListener('pointerdown', e => {
-      if (!wok.classList.contains('stirring')) return;
-      e.preventDefault(); pid = e.pointerId; try { wok.setPointerCapture(pid); } catch (er) { } last = angle(e);
+    const hitEl = this.el.hit; let last = null, pid = null;
+    const angle = e => { const c = this.worldToClient(WOK.cx, WOK.rimY + 6); return Math.atan2((e.clientY - c.y) * 2, e.clientX - c.x); };
+    hitEl.addEventListener('pointerdown', e => {
+      if (!hitEl.classList.contains('stirring')) return;
+      e.preventDefault(); SFX.unlock(); pid = e.pointerId; try { hitEl.setPointerCapture(pid); } catch (er) { } last = angle(e);
     });
-    wok.addEventListener('pointermove', e => {
+    hitEl.addEventListener('pointermove', e => {
       if (last == null || e.pointerId !== pid) return;
       const a = angle(e); let d = a - last; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; last = a;
-      this.addStir(Math.abs(d) / (Math.PI * 2 * 2.2), a);
+      this.stirAcc = (this.stirAcc || 0) + d;
+      this.addStir(Math.abs(d) / (Math.PI * 2 * 2.2), this.stirAcc);
     });
     const up = () => { last = null; pid = null; };
-    wok.addEventListener('pointerup', up); wok.addEventListener('pointercancel', up);
+    hitEl.addEventListener('pointerup', up); hitEl.addEventListener('pointercancel', up);
     // hold-to-stir button lives in the panel (delegated)
     const startHold = e => {
       const b = e.target.closest('[data-act="e-stir"]'); if (!b || b.disabled) return;
       e.preventDefault(); SFX.unlock(); clearInterval(this.holdTimer);
-      let a = 0; this.holdTimer = setInterval(() => { a += 0.5; this.addStir(0.022, a); }, 60);
+      this.holdTimer = setInterval(() => { this.stirAcc = (this.stirAcc || 0) + 0.42; this.addStir(0.022, this.stirAcc); }, 60);
     };
     const stopHold = () => { clearInterval(this.holdTimer); this.holdTimer = null; };
     this.root.addEventListener('pointerdown', startHold);
     this.root.addEventListener('pointerup', stopHold); this.root.addEventListener('pointercancel', stopHold); this.root.addEventListener('pointerleave', stopHold);
     this.root.addEventListener('keydown', e => {
-      if ((e.key === ' ' || e.key === 'Enter') && e.target.closest && e.target.closest('[data-act="e-stir"]')) { e.preventDefault(); this.addStir(0.1, (this.stirAngle || 0) + 0.9); }
+      if ((e.key === ' ' || e.key === 'Enter') && e.target.closest && e.target.closest('[data-act="e-stir"]')) { e.preventDefault(); this.stirAcc = (this.stirAcc || 0) + 0.9; this.addStir(0.1, this.stirAcc); }
     });
   }
   addStir(amount, ang) {
     const v = this.view; if (v.phase !== 'stir' || v.stirred) return;
-    this.stir = Math.min(1, this.stir + amount); this.stirAngle = ang;
-    this.el.wok.style.setProperty('--rot', (ang * 180 / Math.PI).toFixed(1) + 'deg');
+    this.stir = Math.min(1, this.stir + amount);
+    const c = this.cook; c.stirTo(ang); c.setCook(0.3 + 0.7 * this.stir);
+    const now = Date.now();
+    if (!this.lastTossAt || now - this.lastTossAt > 620) { this.lastTossAt = now; c.toss(0.9); }
     const bar = this.el.panel.querySelector('.stirbar');
     if (bar) { bar.querySelector('i').style.width = Math.round(this.stir * 100) + '%'; bar.setAttribute('aria-valuenow', Math.round(this.stir * 100)); }
-    if (!this.lastSizzle || Date.now() - this.lastSizzle > 900) { this.lastSizzle = Date.now(); SFX.play('sizzle'); }
-    const now = Date.now();
+    if (!this.lastSizzle || now - this.lastSizzle > 900) { this.lastSizzle = now; SFX.play('sizzle'); }
     if (now - this.lastPres > 110 || this.stir >= 1) { this.lastPres = now; this.sync.setPresence({ stir: +this.stir.toFixed(3), sid: v.sid, round: v.round }); }
     if (this.stir >= 1 && !this.stirSent) {
       this.stirSent = v.sid + v.round; clearInterval(this.holdTimer);
-      SFX.play('yum'); const R = v.round;
+      SFX.play('yum'); const R = v.round; c.toss(1.15);
       this.sync.update(d => { if (!d.r || d.r.round !== R) d.r = { round: R }; d.r.stirred = true; return d; });
     }
     if (this.stirSent && this.stirSent !== v.sid + v.round) this.stirSent = null;
@@ -2470,7 +3335,7 @@ function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slic
   document.body.insertAdjacentHTML('afterbegin', Art.defs);
   const params = new URLSearchParams(location.search);
   const hashRole = (location.hash || '').replace('#', '');
-  const L = (navigator.language || 'en').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
+  const L = 'en';
   const t = k => tr(L, k);
   const cleanRoom = s => String(s || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 24);
   const newRoom = () => { const a = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = ''; for (let i = 0; i < 5; i++) s += a[Math.floor(Math.random() * a.length)]; return s; };
@@ -2490,18 +3355,18 @@ function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slic
     try {
       if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ title: 'PIP', text: label, url }); return; }
     } catch (e) { if (e && e.name === 'AbortError') return; }
-    try { await navigator.clipboard.writeText(url); btn.querySelector('span').textContent = L === 'zh' ? '已复制 ✓' : 'Copied ✓'; }
+    try { await navigator.clipboard.writeText(url); btn.querySelector('span').textContent = 'Copied ✓'; }
     catch (e) { window.prompt && window.prompt('Copy this link', url); }
   }
 
   function landing() {
     root.innerHTML = `<main class="picker">
       <div class="hero-pip">${pipMarkup('happy')}</div>
-      <h1>PIP</h1><p class="tag">Little moments, together · 一起的小时光</p>
-      <h2>${L === 'zh' ? '两台手机，一起做菜' : 'Cook together on two phones'}</h2>
-      <p class="sub">${L === 'zh' ? '开一个厨房，一台手机当奶奶，一台当 Emma。不用注册。' : 'Start a kitchen, then one phone plays Grandma and the other plays Emma. No sign-up.'}</p>
+      <h1>PIP</h1><p class="tag">Little moments, together</p>
+      <h2>Cook together on two phones</h2>
+      <p class="sub">Start a kitchen, then one phone plays Grandma and the other plays Emma. No sign-up.</p>
       <div class="role-cards">
-        <button type="button" class="btn primary big" data-go="new"><span>${L === 'zh' ? '开一个新厨房' : 'Start a new kitchen'} · ${L === 'zh' ? 'Start' : '开始'}</span></button>
+        <button type="button" class="btn primary big" data-go="new"><span>Start a new kitchen</span></button>
       </div>
       <button type="button" class="link-btn" data-go="both">${esc(t('pickBoth'))}</button>
     </main>`;
@@ -2516,19 +3381,19 @@ function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slic
         <div class="rc-head"><span class="av av-${role}" aria-hidden="true">${av}</span><span><b>${esc(name)}</b><span class="s">${esc(sub)}</span></span></div>
         <div class="rc-qr" aria-label="${esc(name)} QR">${qrSvg(url)}</div>
         <div class="rc-actions">
-          <a class="btn primary" href="${esc(url)}"><span>${L === 'zh' ? '这台手机用' : 'Use this phone'}</span></a>
-          <button type="button" class="btn soft" data-share="${role}"><span>${L === 'zh' ? '发链接' : 'Send link'}</span></button>
+          <a class="btn primary" href="${esc(url)}"><span>Use this phone</span></a>
+          <button type="button" class="btn soft" data-share="${role}"><span>Send link</span></button>
         </div></section>`;
     };
     root.innerHTML = `<main class="picker room">
-      <div class="room-top">${miniPip('happy')}<b>PIP</b><span class="room-code">${L === 'zh' ? '厨房号' : 'Kitchen'} <code>${esc(room)}</code></span></div>
-      <h2>${L === 'zh' ? '每台手机选一个人' : 'Each phone picks a person'}</h2>
-      <p class="sub">${L === 'zh' ? '这台手机点“这台手机用”；另一台手机扫二维码，或者收你发的链接。' : 'Tap “Use this phone” here. On the other phone, scan its QR code or open the link you send.'}</p>
+      <div class="room-top">${miniPip('happy')}<b>PIP</b><span class="room-code">Kitchen <code>${esc(room)}</code></span></div>
+      <h2>Each phone picks a person</h2>
+      <p class="sub">Tap “Use this phone” here. On the other phone, scan its QR code or open the link you send.</p>
       <div class="room-cards">
-        ${card('grandma', '奶', 'Grandma 奶奶', 'Easy · 中文')}
-        ${card('emma', 'E', 'Emma', 'Standard · English')}
+        ${card('grandma', 'G', 'Grandma', 'Easy mode, bigger text')}
+        ${card('emma', 'E', 'Emma', 'Standard mode')}
       </div>
-      <button type="button" class="link-btn" data-go="new">${L === 'zh' ? '换一个新厨房' : 'Start a different kitchen'}</button>
+      <button type="button" class="link-btn" data-go="new">Start a different kitchen</button>
     </main>`;
     root.querySelectorAll('[data-share]').forEach(b => b.addEventListener('click', () => {
       const r = b.dataset.share; shareOrCopy(linkFor(room, r), b, r === 'grandma' ? 'PIP: Grandma’s phone' : 'PIP: Emma’s phone');
@@ -2556,12 +3421,12 @@ function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slic
   function split() {
     const hub = new LocalHub('web-split', { mode: 'same-screen' });
     root.innerHTML = `<div class="split">
-      <header class="split-head"><h1>${miniPip('happy')}PIP</h1><p>Grandma’s Kitchen · 奶奶的厨房</p>
-        <button type="button" class="btn soft" data-split="reset">Start over · 重新开始</button>
-        <a class="btn soft" href="${esc(baseUrl)}">Two real phones · 两台手机</a></header>
+      <header class="split-head"><h1>${miniPip('happy')}PIP</h1><p>Grandma’s Kitchen</p>
+        <button type="button" class="btn soft" data-split="reset">Start over</button>
+        <a class="btn soft" href="${esc(baseUrl)}">Two real phones</a></header>
       <div class="phones">
-        <div class="phone-col"><div class="phone-cap"><span class="av av-grandma" aria-hidden="true">奶</span>奶奶的手机 · Grandma (Easy · 中文)</div><div class="phone-holder"><div class="phone"><div class="phone-screen" data-p="grandma"></div></div></div></div>
-        <div class="phone-col"><div class="phone-cap"><span class="av av-emma" aria-hidden="true">E</span>Emma’s phone (Standard · English)</div><div class="phone-holder"><div class="phone"><div class="phone-screen" data-p="emma"></div></div></div></div>
+        <div class="phone-col"><div class="phone-cap"><span class="av av-grandma" aria-hidden="true">G</span>Grandma’s phone (Easy mode)</div><div class="phone-holder"><div class="phone"><div class="phone-screen" data-p="grandma"></div></div></div></div>
+        <div class="phone-col"><div class="phone-cap"><span class="av av-emma" aria-hidden="true">E</span>Emma’s phone (Standard mode)</div><div class="phone-holder"><div class="phone"><div class="phone-screen" data-p="emma"></div></div></div></div>
       </div>
       <p class="split-foot">Both phones run on this one screen. For two real phones, tap “Two real phones”, start a kitchen, and open one link on each phone.</p>
     </div>`;

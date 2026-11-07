@@ -2,6 +2,8 @@
 
 A two-phone demo for the WashUX Design-A-Thon 2026. PIP is a shared fluffy companion: Grandma teaches a family dish on one phone, Emma cooks it on the other, and PIP hops between the two screens carrying each person's part.
 
+Every cooking step is animated on both phones: Emma cracks, chops, pours and stirs in her wok while Grandma watches it live through a little window on her phone, then PIP plates the dish, tastes it and reacts.
+
 No sign-up. The two phones sync in real time through free public MQTT message servers (each phone uses two servers at once for reliability). Messages only carry dish choices and taps, no personal data.
 
 ## Use it
