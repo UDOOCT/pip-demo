@@ -1373,7 +1373,7 @@ const STR = {
     snap_save: 'Save photo', snap_share: 'Share', snap_continue: 'Continue', snap_developing: 'Developing…', snap_saved: 'Saved to your downloads',
     photo_alt: 'Group photo: Grandma and Steven with PIP and the dish',
     // PIP and turns
-    your_turn: 'Your turn', turn_of: '{name}’s turn', g_watching: 'Grandma is watching', tap_toss: 'Tip: tap the wok to toss!', photo_title: 'Cooking with Grandma',
+    your_turn: 'Your turn', turn_of: '{name}’s turn', g_watching: 'Grandma is watching', tap_toss: 'Tip: tap the wok to toss!', photo_title: 'Cooking with Grandma', snap_nosave: 'Saving isn’t available here. Long-press the photo to save it.',
     tap_home: ['Hehe, that tickles!', 'Boop!', 'I missed you!', 'Hi hi!'],
     tap_cook: ['Smells so good!', 'I’m helping!', 'Yum yum!', 'Sizzle sizzle!'],
     tap_wait: ['Almost your turn!', 'Hmm, what will it be?', 'Hehe, waiting with you!'],
@@ -4140,6 +4140,16 @@ class PipApp {
   photoFileName() { const v = this.view; return `PIP-${(DISHES[v.dish] ? DISHES[v.dish].short.en : 'dish').replace(/[^A-Za-z]+/g, '-')}-${new Date().toISOString().slice(0, 10)}.jpg`; }
   async snapSave() {
     const url = this.groupFor(this.momentFromView(this.view)); if (!url) return;
+    // inside Claude, files can only be handed over through the artifact's downloads capability
+    const c = window.claude;
+    if (c && typeof c.use === 'function') {
+      let dl = null; try { dl = await c.use('downloads'); } catch (e) { dl = null; }
+      if (dl && typeof dl.save === 'function') {
+        try { await dl.save({ filename: this.photoFileName(), data: this.dataUrlBlob(url) }); this.toast(this.t('snap_saved'), Art.icon('camera', 'ti')); }
+        catch (e) { if (!e || e.code !== 'declined') this.toast(this.t('snap_nosave')); }
+        return;
+      }
+    }
     try {
       const a = document.createElement('a'); a.href = URL.createObjectURL(this.dataUrlBlob(url)); a.download = this.photoFileName();
       document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
