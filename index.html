@@ -1577,7 +1577,7 @@ class CloudHub extends BaseHub {
     if (this.chan) this.chan.emit('doc', { role, doc }).catch(() => { });
     if (this.db) this.flush(`${this.base}/roles/${role}`, () => this.docs[role]);
   }
-  async flush(path, get) {
+  async flush(path, get, soft) {
     if (this.writing[path]) { this.dirty[path] = true; return; }
     this.writing[path] = true;
     try {
@@ -1589,7 +1589,7 @@ class CloudHub extends BaseHub {
         catch (e) {
           const code = e && e.code;
           if ((code === 'unavailable' || code === 'resource_exhausted') && tries < 4) { tries++; this.dirty[path] = true; await sleep(400 + Math.random() * 600 * tries); }
-          else if (code === 'invalid_argument' || code === 'revoked' || code === 'not_granted') { this.canWrite = false; this.status = 'view'; this.notify(); }
+          else if (!soft && (code === 'invalid_argument' || code === 'revoked' || code === 'not_granted')) { this.canWrite = false; this.status = 'view'; this.notify(); }
         }
       } while (this.dirty[path]);
     } finally { this.writing[path] = false; }
@@ -1614,18 +1614,18 @@ class CloudHub extends BaseHub {
   savePhoto(role, rec) {
     this.photos[role] = rec; this.notify();
     this.photoWrites = Object.assign({}, this.photoWrites, { [role]: rec });
-    if (this.db) this.flush(`${this.base}/photos/${role}`, () => this.photoWrites[role]);
+    if (this.db) this.flush(`${this.base}/photos/${role}`, () => this.photoWrites[role], true);
   }
   dropPhoto(role) {
     if (!this.photos[role]) return;
     this.photos[role] = null; this.notify();
     this.photoWrites = Object.assign({}, this.photoWrites, { [role]: null });
-    if (this.db) this.flush(`${this.base}/photos/${role}`, () => null);
+    if (this.db) this.flush(`${this.base}/photos/${role}`, () => null, true);
   }
   async clearMoments() {
     const ids = this.moments.map(m => m.id); this.moments = []; this.photos = { grandma: null, steven: null }; this.notify();
     if (!this.db) return;
-    for (const r of ROLES) { this.photoWrites = Object.assign({}, this.photoWrites, { [r]: null }); this.flush(`${this.base}/photos/${r}`, () => null); }
+    for (const r of ROLES) { this.photoWrites = Object.assign({}, this.photoWrites, { [r]: null }); this.flush(`${this.base}/photos/${r}`, () => null, true); }
     for (const id of ids) { this.momentWrites[id] = null; await this.flush(`${this.base}/moments/${id}`, () => null); }
   }
 }
