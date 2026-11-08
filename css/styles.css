@@ -541,7 +541,7 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 /* ---------- web build: kitchen code page ---------- */
-.picker.room { justify-content: flex-start; padding-top: 22px; gap: 10px; }
+.picker.room { justify-content: flex-start; padding-top: calc(env(safe-area-inset-top) + 22px); gap: 10px; }
 .room-top { display: flex; align-items: center; gap: 8px; font: 600 22px/1 var(--font-display); letter-spacing: .1em; }
 .room-top .mini-pip { width: 34px; height: 34px; }
 .room-code { margin-left: 8px; font: 800 13px/1 var(--font-body); letter-spacing: .04em; background: var(--paper); border-radius: 999px; padding: 6px 10px; }
