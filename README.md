@@ -1,14 +1,19 @@
 # PIP · Grandma's Kitchen
 
-PIP is a shared, fluffy companion that hops between two phones.
-Grandma teaches a dish on her phone, Steven cooks it on his, and PIP carries every step between them.
+PIP is a shared, fluffy companion that hops between two phones, with a shelf of little games
+for a grandparent and a grandchild to play from their own homes.
+
+**Cook together** is the game that is built: Grandma teaches a dish on her phone, Steven cooks it on his,
+and PIP carries every step between them. The other games on the shelf (garden, drawing, stories, singing,
+chess, photos, walks, letters) are placeholders that show where PIP goes next.
+
 Made for the **WashUX Design-A-Thon 2026**.
 
 Live demo: https://udooct.github.io/pip-demo/
 
 ## Try it
 
-- **Two phones:** open the link on one phone and tap **Start a new kitchen**. Each phone opens its own link or QR code: one is Grandma, one is Steven.
+- **Two phones:** open the link on one phone. On PIP's game shelf, tap **Cook together → Start**. Each phone then opens its own link or QR code: one is Grandma, one is Steven.
 - **One screen:** add `?view=both` to the link to see both phones side by side.
 
 The story:

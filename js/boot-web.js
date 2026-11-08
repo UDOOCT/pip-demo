@@ -39,15 +39,22 @@
     root.innerHTML = `<main class="picker">
       <div class="hero-room" aria-hidden="true"><div class="world"><div class="scene-wrap">${Art.home('courtyard', 3)}</div><div class="hero-pip">${pipMarkup('happy')}</div></div></div>
       <h1>PIP</h1><p class="tag">Little moments, together</p>
-      <h2>Cook together on two phones</h2>
-      <p class="sub">Start a kitchen, then one phone plays Grandma and the other plays Steven. No sign-up.</p>
-      <div class="role-cards">
-        <button type="button" class="btn primary big" data-go="new"><span>Start a new kitchen</span></button>
-      </div>
+      <h2>${esc(t('landing_games'))}</h2>
+      <p class="sub">${esc(t('landing_games_sub'))}</p>
+      ${gameShelf({ attr: 'data-go="new"', title: t('game_cook'), sub: 'Grandma teaches a family dish, Steven cooks it.', cta: 'Start', moreLabel: t('more_games'), soonAttr: 'data-soon' })}
+      <p class="soon-note" data-soon-note aria-live="polite"></p>
       <button type="button" class="link-btn" data-go="both">${esc(t('pickBoth'))}</button>
     </main>`;
     root.querySelector('[data-go="new"]').onclick = () => go(linkFor(newRoom()));
     root.querySelector('[data-go="both"]').onclick = () => go(baseUrl + '?view=both');
+    // the other games are on their way: a little shake and a note
+    const note = root.querySelector('[data-soon-note]');
+    root.querySelectorAll('[data-soon]').forEach(b => b.onclick = () => {
+      const g = GAMES.find(x => x.k === b.dataset.soon);
+      b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+      note.textContent = `${g ? g.name : 'That game'} is coming soon. Cooking is ready to play!`;
+      note.classList.remove('show'); void note.offsetWidth; note.classList.add('show');
+    });
   }
 
   function roomPage(room) {

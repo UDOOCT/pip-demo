@@ -4,6 +4,17 @@
    ============================================================ */
 const reduceMotion = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// PIP's game shelf: one big card for cooking (the game that works), then the games still to come
+function gameShelf(o) {
+  const arrow = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg>';
+  const lock = '<svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="8" rx="2.2"/><path d="M5.3 7V5.3a2.7 2.7 0 0 1 5.4 0V7"/></svg>';
+  return `<div class="game-shelf">` +
+    `<button type="button" class="game-feature" ${o.attr}><span class="gf-art">${Art.icon('cook')}</span>` +
+    `<span class="gf-text"><b>${esc(o.title)}</b><small>${esc(o.sub)}</small></span><span class="gf-go">${esc(o.cta)}${arrow}</span></button>` +
+    `<p class="games-label">${esc(o.moreLabel)}</p><div class="games">` +
+    GAMES.map((g, i) => `<button type="button" class="game locked" style="--gi:${i}" ${o.soonAttr}="${g.k}" aria-label="${esc(g.name)}, coming soon">${Art.icon(g.icon)}<span>${esc(g.name)}</span><i class="lock" aria-hidden="true">${lock}</i></button>`).join('') +
+    `</div></div>`;
+}
 // speech-bubble text, one span per word so the words can drift in one after another
 const wordSpans = (s, from = 0) => esc(s).split(' ').map((w, i) => `<span class="w" style="--i:${i + from}">${w}</span>`).join(' ');
 let APP_SEQ = 0;
@@ -351,6 +362,14 @@ class PipApp {
   }
   handleWaves() {
     const d = this.hub.docs[this.other]; const w = d && d.waveAt || 0;
+    const a = d && d.askAt || 0;
+    if (a && a > (this.seenAsk || 0)) {
+      const first = !this.live; this.seenAsk = a;
+      if (!first && this.role === 'grandma') {
+        this.toast(this.t('t_ask_cook'), miniPip('happy', 'ti')); SFX.play('ding'); haptic(30);
+        if (this.view && this.view.phase === 'idle' && this.pipHereShown) { this.setExpression('joy'); this.pipHearts(4); this.later(() => this.setExpression(this.exprOf(this.view)), 1800); }
+      }
+    }
     if (w && w > (this.seenWave[this.other] || 0)) {
       const first = !this.live; this.seenWave[this.other] = w;
       if (!first) {
@@ -712,8 +731,8 @@ class PipApp {
           `</div><div class="row-actions">${this.btn(this.t('back'), 'g-back', { cls: 'ghost' })}</div>`;
       }
       return this.head(this.t('g_home_title'), this.t('g_home_sub')) +
-        `<div class="col-actions">${this.btn(this.t('yes_teach'), 'g-yes', { cls: 'primary big', icon: Art.icon('envelope', 'bi') })}${this.btn(this.t('later'), 'g-later', { cls: 'soft big' })}</div>` +
-        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'ghost', icon: Art.icon('heart', 'bi') })}${this.btn(this.t(this.role === 'steven' ? 'wave_to_g' : 'wave_to_e'), 'wave', { cls: 'ghost', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+        gameShelf({ attr: 'data-act="g-yes"', title: this.t('game_cook'), sub: this.t('game_cook_g'), cta: this.t('play'), moreLabel: this.t('more_games'), soonAttr: 'data-act="game-soon" data-arg' }) +
+        `<div class="home-links">${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited') return this.head(this.t('waiting_t'), null, dots) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
     if (ph === 'declined') return this.head(this.t('declined_t'), this.t('declined')) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
@@ -769,8 +788,9 @@ class PipApp {
     const L = this.prefs.lang, ph = v.phase, n = this.hub.moments.length, easy = this.prefs.mode === 'easy';
     const dots = `<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>`;
     if (ph === 'idle') {
-      return this.head(this.t('e_home_title'), this.t('e_home_sub')) +
-        `<div class="row-actions">${this.btn(this.t('moments') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t(this.role === 'steven' ? 'wave_to_g' : 'wave_to_e'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+      return this.head(this.t('e_home_title_v2'), this.t('e_home_sub_v2')) +
+        gameShelf({ attr: 'data-act="e-ask"', title: this.t('game_cook'), sub: this.t('game_cook_e'), cta: this.t('ask_g'), moreLabel: this.t('more_games'), soonAttr: 'data-act="game-soon" data-arg' }) +
+        `<div class="home-links">${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited' || ph === 'declined') {
       return this.head(this.t('open_title'), this.t('open_sub')) + this.dishChip(v.dish) +
@@ -1023,7 +1043,7 @@ class PipApp {
     const act = b.dataset.act, arg = b.dataset.arg;
     SFX.unlock();
     const hubBusy = this.hub.kind === 'cloud' && !this.hub.ready;
-    const writes = !['sound', 'menu', 'close', 'about', 'moments', 'open-moment', 'pref', 'speak', 'switch', 'both', 'e-stir'].includes(act);
+    const writes = !['sound', 'menu', 'close', 'about', 'moments', 'open-moment', 'pref', 'speak', 'switch', 'both', 'e-stir', 'game-soon'].includes(act);
     if (writes && hubBusy) { this.toast(this.t('connecting_hold')); return; }
     if (writes && this.hub.status === 'view') { this.toast(this.t('readonly')); return; }
     haptic();
@@ -1069,6 +1089,15 @@ class PipApp {
         for (const r of ROLES) this.hub.write(r, { v: Math.max(((this.hub.docs[r] && this.hub.docs[r].v) || 0) + 1, Date.now()), role: r, at: Date.now() });
         this.hub.clearMoments(); this.local.gScreen = 'home'; this.local.laterSaid = false; this.inviteDismissed = {};
         break;
+      case 'game-soon': {
+        const g = GAMES.find(x => x.k === arg);
+        b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+        this.toast(this.t('soon_toast', { game: g ? g.name : '' }), miniPip('curious', 'ti')); SFX.play('pop'); break;
+      }
+      case 'e-ask':
+        this.sync.update(d => { d.askAt = Date.now(); d.ask = 'cook'; return d; });
+        this.toast(this.t('asked'), miniPip('happy', 'ti')); this.setExpression('happy'); this.pipHearts(3);
+        this.later(() => this.setExpression(this.exprOf(this.view)), 1600); break;
       case 'wave':
         this.sync.update(d => { d.waveAt = Date.now(); return d; });
         this.toast(this.t('waved')); this.setExpression('wave'); this.later(() => this.setExpression(this.exprOf(this.view)), 1500); break;

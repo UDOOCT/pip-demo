@@ -7,6 +7,13 @@ const DISHES = {
   fried_rice: { core: ['rice', 'egg'], secrets: ['soy', 'scallion', 'none'], en: 'Egg Fried Rice', short: { en: 'Egg Fried Rice' }, desc: 'Golden rice with fluffy egg', flower: '#FFD45C' },
   bok_choy: { core: ['garlic', 'bokchoy'], secrets: ['salt', 'sugar', 'none'], en: 'Garlic Bok Choy', short: { en: 'Garlic Bok Choy' }, desc: 'Garlicky greens, ready in minutes', flower: '#9DD48A' }
 };
+// PIP's game shelf. Cooking is the one that is built; the others are placeholders.
+const GAMES = [
+  { k: 'garden', icon: 'garden', name: 'Garden' }, { k: 'draw', icon: 'draw', name: 'Draw' },
+  { k: 'stories', icon: 'story', name: 'Stories' }, { k: 'sing', icon: 'sing', name: 'Sing' },
+  { k: 'chess', icon: 'chess', name: 'Chess' }, { k: 'photos', icon: 'photos', name: 'Photos' },
+  { k: 'walk', icon: 'walk', name: 'Walk' }, { k: 'letters', icon: 'envelope', name: 'Letters' },
+];
 const DISH_ORDER = ['tomato_egg', 'fried_rice', 'bok_choy'];
 
 const ING = {
@@ -68,8 +75,14 @@ const STR = {
     here: 'here', away: 'away',
     menu: 'Menu', soundOn: 'Sound on', soundOff: 'Sound off', listen: 'Listen',
     // Grandma home
-    g_home_bubble: 'Has Steven eaten yet? Want to teach him a dish?',
-    g_home_title: 'Teach Steven a dish?', g_home_sub: 'PIP will take your invitation to him.',
+    g_home_bubble: 'What shall we play with Steven today?',
+    g_home_title: 'What shall we play?', g_home_sub: 'Pick a game. PIP brings it to Steven.', moments_short: 'Moments', wave_short: 'Wave',
+    e_home_title_v2: 'Play with Grandma', e_home_sub_v2: 'Grandma picks the game. Hungry? Ask her to cook!',
+    game_cook: 'Cook together', game_cook_g: 'Teach Steven a family dish', game_cook_e: 'Grandma teaches, you cook',
+    play: 'Play', ask_g: 'Ask', more_games: 'More games · coming soon',
+    soon_toast: '{game} is coming soon. PIP is still learning it!', asked: 'PIP told Grandma you’d love to cook ✨',
+    t_ask_cook: 'Steven wants to cook with you! 🍳', landing_games: 'Pick a game to play together',
+    landing_games_sub: 'Two phones, one PIP. Grandma and Steven play from their own homes.',
     yes_teach: 'Yes, teach him!', later: 'Maybe later', later_bubble: 'Okay! Tap me whenever you want to teach.',
     choose_dish: 'Which dish will you teach?', back: 'Back',
     waiting_t: 'PIP went to get Steven', waiting: 'Today’s lesson: {dish}', cancel: 'Cancel',
