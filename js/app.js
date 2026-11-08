@@ -125,7 +125,7 @@ class PipApp {
     if (this.unsub) this.unsub();
     if (this.ro) this.ro.disconnect();
     if (this.cook) this.cook.stop(); if (this.mini) this.mini.stop(); if (this.cam) this.cam.stop();
-    this.timers.forEach(clearTimeout); clearInterval(this.holdTimer); clearTimeout(this.gcTimer); clearTimeout(this.snapNowTimer);
+    this.timers.forEach(clearTimeout); clearInterval(this.holdTimer); clearInterval(this.callTimer); clearTimeout(this.gcTimer); clearTimeout(this.snapNowTimer);
     this.root.innerHTML = '';
   }
   later(fn, ms) { const id = setTimeout(fn, ms); this.timers.push(id); return id; }
@@ -161,6 +161,7 @@ class PipApp {
           <div class="away" data-away hidden></div>
           <canvas class="fx-cv" data-fx aria-hidden="true"></canvas>
         </div>
+        <div class="callwin" data-call hidden></div>
         <div class="porthole" data-port hidden></div>
         <div class="photo" data-photo hidden></div>
       </main>
@@ -177,7 +178,7 @@ class PipApp {
       stage: q('[data-stage]'), world: q('[data-world]'), scene: q('[data-scene]'), cookCv: q('[data-cook]'), fxCv: q('[data-fx]'), hit: q('[data-hit]'),
       pip: q('[data-pip]'), mover: q('[data-mover]'), carry: q('[data-carry]'), bubble: q('[data-bubble]'),
       away: q('[data-away]'), port: q('[data-port]'), photo: q('[data-photo]'), ribbon: q('[data-ribbon]'), panel: q('[data-panel]'),
-      sheet: q('[data-sheet]'), overlay: q('[data-overlay]'), announce: q('[data-announce]'), snd: q('[data-act="sound"]'), menu: q('[data-act="menu"]'), topbar: q('[data-topbar]')
+      sheet: q('[data-sheet]'), call: q('[data-call]'), overlay: q('[data-overlay]'), announce: q('[data-announce]'), snd: q('[data-act="sound"]'), menu: q('[data-act="menu"]'), topbar: q('[data-topbar]')
     };
     this.applyPrefs();
     // the cooking stage: Steven's stove and wok, plus effects drawn above PIP on both phones
@@ -189,14 +190,14 @@ class PipApp {
     const fit = () => {
       const s = this.el.stage.getBoundingClientRect();
       if (!s.width || !s.height) return;
-      if (this.holdFit) { this.placePort(); return; } // the sheet is gliding: keep the room steady until it lands
+      if (this.holdFit) { this.placePort(); this.placeCall(); return; } // the sheet is gliding: keep the room steady until it lands
       const cover = Math.min(Math.max(s.width, s.height * 390 / 420), s.width * 1.08);
       const room = s.height - this.topSafe();
       const w = Math.round(Math.max(s.width * 0.58, Math.min(cover, room * 390 / this.focusBand())));
       this.el.world.style.width = w + 'px';
       this.el.world.style.setProperty('--stage-h', s.height + 'px');
       this.el.world.style.setProperty('--wscale', (w / 390).toFixed(4));
-      this.placeBubble(); this.placePort();
+      this.placeBubble(); this.placePort(); this.placeCall();
       if (this.cook) this.cook.resize();
     };
     this.fit = fit;
@@ -239,6 +240,7 @@ class PipApp {
     else this.refreshLive(v);
     this.photoTick(v);
     this.photoGC(v);
+    this.renderCall();
   }
   // once the session has moved on, take this phone's selfie off the sync servers
   // (waits a moment so a half-loaded state never removes a photo that is still needed)
@@ -551,6 +553,15 @@ class PipApp {
     let dx = 0;
     if (br.left < sr.left + 10) dx = sr.left + 10 - br.left;
     else if (br.right > sr.right - 10) dx = sr.right - 10 - br.right;
+    // make way for the video-call window
+    const cw = this.el.call;
+    if (cw && !cw.hidden) {
+      const c = cw.getBoundingClientRect();
+      if (br.top < c.bottom + 6 && br.bottom > c.top - 6 && br.right + dx > c.left - 8 && br.left + dx < c.right + 8) {
+        const toLeft = c.left - 8 - br.right, toRight = c.right + 8 - br.left;
+        dx = (c.left + c.width / 2 > sr.left + sr.width / 2) ? Math.max(sr.left + 10 - br.left, toLeft) : Math.min(sr.right - 10 - br.right, toRight);
+      }
+    }
     b.style.setProperty('--bx', Math.round(dx) + 'px');
   }
   /* ---------------- the cooking stage (Steven's stove and wok) ---------------- */
@@ -732,7 +743,7 @@ class PipApp {
       }
       return this.head(this.t('g_home_title'), this.t('g_home_sub')) +
         gameShelf({ attr: 'data-act="g-yes"', title: this.t('game_cook'), sub: this.t('game_cook_g'), cta: this.t('play'), moreLabel: this.t('more_games'), soonAttr: 'data-act="game-soon" data-arg' }) +
-        `<div class="home-links">${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+        `<div class="home-links">${this.callBtn()}${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited') return this.head(this.t('waiting_t'), null, dots) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
     if (ph === 'declined') return this.head(this.t('declined_t'), this.t('declined')) + this.dishChip(v.dish) + `<div class="row-actions">${this.btn(this.t('cancel'), 'end', { cls: 'ghost' })}</div>`;
@@ -790,7 +801,7 @@ class PipApp {
     if (ph === 'idle') {
       return this.head(this.t('e_home_title_v2'), this.t('e_home_sub_v2')) +
         gameShelf({ attr: 'data-act="e-ask"', title: this.t('game_cook'), sub: this.t('game_cook_e'), cta: this.t('ask_g'), moreLabel: this.t('more_games'), soonAttr: 'data-act="game-soon" data-arg' }) +
-        `<div class="home-links">${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
+        `<div class="home-links">${this.callBtn()}${this.btn(this.t('moments_short') + (n ? ` (${n})` : ''), 'moments', { cls: 'soft', icon: Art.icon('heart', 'bi') })}${this.btn(this.t('wave_short'), 'wave', { cls: 'soft', icon: '<span class="emo" aria-hidden="true">👋</span>' })}</div>`;
     }
     if (ph === 'invited' || ph === 'declined') {
       return this.head(this.t('open_title'), this.t('open_sub')) + this.dishChip(v.dish) +
@@ -906,10 +917,12 @@ class PipApp {
     else if (kind === 'moments') html = this.momentsHTML();
     else if (kind === 'menu') html = this.menuHTML();
     else if (kind === 'about') html = this.aboutHTML();
+    else if (kind === 'call') html = this.callHTML(arg);
     const wasOpen = !o.hidden;
     o.innerHTML = html; o.hidden = !html;
     o.className = 'overlay ov-' + kind + (animate && !wasOpen ? ' enter' : '');
-    if (!html) { this.local.overlay = null; return; }
+    if (!html) { this.local.overlay = null; this.callMini(); return; }
+    this.callMini();
     if (kind === 'card' && animate) { SFX.play('chime'); }
     const focusEl = o.querySelector('[data-autofocus]') || o.querySelector('h2');
     if (focusEl && (animate || kind !== 'card')) this.later(() => focusEl.focus({ preventScroll: true }), 60);
@@ -917,7 +930,7 @@ class PipApp {
   closeOverlay(silent) {
     if (this.cam) this.cam.stop();
     const back = this.local.overlay === 'moment' ? 'moments' : null;
-    this.local.overlay = null; this.el.overlay.hidden = true; this.el.overlay.innerHTML = '';
+    this.local.overlay = null; this.el.overlay.hidden = true; this.el.overlay.innerHTML = ''; this.callMini();
     if (back && !silent) return this.openOverlay('moments', null, false);
     if (!silent) { const b = this.el.menu; if (b) b.focus({ preventScroll: true }); }
   }
@@ -1043,7 +1056,7 @@ class PipApp {
     const act = b.dataset.act, arg = b.dataset.arg;
     SFX.unlock();
     const hubBusy = this.hub.kind === 'cloud' && !this.hub.ready;
-    const writes = !['sound', 'menu', 'close', 'about', 'moments', 'open-moment', 'pref', 'speak', 'switch', 'both', 'e-stir', 'game-soon'].includes(act);
+    const writes = !['sound', 'menu', 'close', 'about', 'moments', 'open-moment', 'pref', 'speak', 'switch', 'both', 'e-stir', 'game-soon', 'call-later', 'call-mute'].includes(act);
     if (writes && hubBusy) { this.toast(this.t('connecting_hold')); return; }
     if (writes && this.hub.status === 'view') { this.toast(this.t('readonly')); return; }
     haptic();
@@ -1089,6 +1102,17 @@ class PipApp {
         for (const r of ROLES) this.hub.write(r, { v: Math.max(((this.hub.docs[r] && this.hub.docs[r].v) || 0) + 1, Date.now()), role: r, at: Date.now() });
         this.hub.clearMoments(); this.local.gScreen = 'home'; this.local.laterSaid = false; this.inviteDismissed = {};
         break;
+      case 'call-start':
+        this.sync.update(d => { d.call = { on: true, since: Date.now() }; return d; });
+        this.local.callAsked = true; if (this.local.overlay === 'call') this.closeOverlay(true);
+        SFX.play('pop'); this.renderCall(); break;
+      case 'call-end':
+        this.sync.update(d => { d.call = { on: false, since: Date.now() }; return d; });
+        this.local.muted = false; this.renderCall(); break;
+      case 'call-later':
+        this.local.callAsked = true; if (this.local.callIncoming) this.local.callDeclined = this.local.callIncoming;
+        this.closeOverlay(true); break;
+      case 'call-mute': this.local.muted = !this.local.muted; this.renderCall(); break;
       case 'game-soon': {
         const g = GAMES.find(x => x.k === arg);
         b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
@@ -1107,7 +1131,7 @@ class PipApp {
       case 'g-later': this.local.laterSaid = true; this.update(); break;
       case 'g-dish':
         SFX.play('pop');
-        this.sync.update(d => ({ waveAt: d.waveAt, sid: uid('s'), dish: arg, inviteAt: Date.now(), round: 1, r: { round: 1 } }));
+        this.sync.update(d => ({ waveAt: d.waveAt, call: d.call, askAt: d.askAt, sid: uid('s'), dish: arg, inviteAt: Date.now(), round: 1, r: { round: 1 } }));
         break;
       case 'g-first': this.flyToPip(b); this.sync.update(d => { myR(d).first = arg; return d; }); break;
       case 'g-secret': this.flyToPip(b); this.sync.update(d => { myR(d).secret = arg; return d; }); break;
@@ -1116,11 +1140,11 @@ class PipApp {
       // Steven
       case 'e-join':
         SFX.play('pop'); this.closeOverlay(true);
-        this.sync.update(d => ({ waveAt: d.waveAt, sid: v.sid, joinAt: Date.now(), round: 1, r: { round: 1 } }));
+        this.sync.update(d => ({ waveAt: d.waveAt, call: d.call, askAt: d.askAt, sid: v.sid, joinAt: Date.now(), round: 1, r: { round: 1 } }));
         break;
       case 'e-decline':
         this.inviteDismissed = Object.assign({}, this.inviteDismissed, { [v.sid]: true }); this.closeOverlay(true);
-        this.sync.update(d => ({ waveAt: d.waveAt, sid: v.sid, declineAt: Date.now(), round: 1 }));
+        this.sync.update(d => ({ waveAt: d.waveAt, call: d.call, askAt: d.askAt, sid: v.sid, declineAt: Date.now(), round: 1 }));
         break;
       case 'e-add': this.addToWok(arg); break;
       case 'e-sprinkle': this.sprinkle(); break;
@@ -1180,7 +1204,7 @@ class PipApp {
     const key = this.snapKey(v);
     if (!this.snap || this.snap.key !== key) this.snap = { key, stage: null, shot: null, since: Date.now(), now: false };
     if (!this.snap.stage) this.snap.stage = this.photoOf(this.role, v) ? (this.photoOf(this.other, v) ? 'reveal' : 'wait') : 'camera';
-    this.local.overlay = 'selfie';
+    this.local.overlay = 'selfie'; this.callMini();
     this.renderSelfie(animate);
   }
   snapStatus(v) {
@@ -1439,6 +1463,114 @@ class PipApp {
       b.dataset.v = ''; if (keep) { b.innerHTML = keep; this.placeBubble(); } else b.hidden = true;
       this.renderBubble(this.view);
     }, 1700);
+  }
+  /* ---------------- video call: a small window that floats over every step ---------------- */
+  callState() {
+    const mine = (this.hub.docs[this.role] || {}).call, theirs = (this.hub.docs[this.other] || {}).call;
+    const me = !!(mine && mine.on), them = !!(theirs && theirs.on) && this.hub.online(this.other);
+    return { me, them, live: me && them, theirSince: theirs && theirs.since || 0, since: Math.max(mine && mine.since || 0, theirs && theirs.since || 0) };
+  }
+  callBtn() {
+    const c = this.callState(), cam = '<svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3" fill="currentColor"/><path d="M16.5 10.2 21.5 7v10l-5-3.2z" fill="currentColor"/></svg>';
+    return this.btn(c.me ? this.t('call_end_short') : this.t('call_btn'), c.me ? 'call-end' : 'call-start', { cls: 'soft' + (c.me ? ' in-call' : ''), icon: cam });
+  }
+  callHTML(mode) {
+    const name = this.name(this.other), inc = mode === 'incoming';
+    return `<div class="modal callcard" role="dialog" aria-labelledby="call-h">
+      <div class="cc-ring${inc ? ' ringing' : ''}"><div class="cc-face">${Art.callFace(this.other)}</div><span class="cc-pip">${pipMarkup('happy', 'cc-pipm')}</span></div>
+      <h2 id="call-h" tabindex="-1" data-autofocus>${esc(this.t(inc ? 'call_in' : 'call_q', { name }))}</h2>
+      <p class="sub">${esc(this.t('call_sub'))}</p>
+      <div class="col-actions">${this.btn(this.t(inc ? 'call_join' : 'call_start'), 'call-start', { cls: 'primary big', icon: '<svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3" fill="currentColor"/><path d="M16.5 10.2 21.5 7v10l-5-3.2z" fill="currentColor"/></svg>' })}${this.btn(this.t('call_later'), 'call-later', { cls: 'ghost' })}</div>
+    </div>`;
+  }
+  renderCall() {
+    const w = this.el.call; if (!w) return;
+    const c = this.callState(), v = this.view;
+    // someone is calling: ask once (never over the invitation, a selfie or the keepsake card)
+    if (this.live && c.them && !c.me && !this.local.overlay && this.local.callDeclined !== c.theirSince) {
+      this.local.callIncoming = c.theirSince; this.openOverlay('call', 'incoming'); SFX.play('ding'); haptic(30);
+    }
+    // first time in the app: offer a call (real phones only; automated test browsers skip it)
+    if (this.live && !c.me && !c.them && !this.local.callAsked && !this.local.overlay && v && v.phase === 'idle' && !navigator.webdriver) {
+      this.local.callAsked = true; this.later(() => { if (!this.local.overlay && !this.callState().me) this.openOverlay('call', 'start'); }, 900);
+    }
+    if (this.local.overlay === 'call' && (c.me || (this.local.overlayArg === 'incoming' && !c.them))) this.closeOverlay(true);
+    // joins and leaves; when the other person hangs up, the call ends on this phone too
+    const theirs = (this.hub.docs[this.other] || {}).call, mine = (this.hub.docs[this.role] || {}).call;
+    if (this.live && c.me && this.prevCall && this.prevCall.live && !c.them && theirs && theirs.on === false && (theirs.since || 0) >= ((mine && mine.since) || 0)) {
+      this.prevCall = null; this.local.muted = false;
+      this.toast(this.t('t_call_ended', { name: this.name(this.other) }));
+      this.sync.update(d => { d.call = { on: false, since: Date.now() }; return d; });
+      return;
+    }
+    if (this.live && this.prevCall && this.prevCall.me) {
+      if (c.them && !this.prevCall.them) { this.toast(this.t('t_call_joined', { name: this.name(this.other) }), miniPip('happy', 'ti')); SFX.play('chime'); }
+      else if (!c.them && this.prevCall.them) this.toast(this.t('t_call_left', { name: this.name(this.other) }));
+    }
+    this.prevCall = c;
+    // the Call button on the home screen follows the call
+    const hb = this.el.panel && this.el.panel.querySelector('[data-act="call-start"], [data-act="call-end"]');
+    if (hb && (hb.dataset.act === 'call-end') !== c.me) { const tmp = document.createElement('div'); tmp.innerHTML = this.callBtn(); hb.replaceWith(tmp.firstElementChild); }
+    if (!c.me) { if (!w.hidden || w.dataset.key) { w.hidden = true; w.innerHTML = ''; w.dataset.state = ''; w.dataset.key = ''; w.className = 'callwin'; this.el.stage.classList.remove('has-call'); this.el.app.classList.remove('call-mini'); } clearInterval(this.callTimer); this.callTimer = null; return; }
+    const state = c.live ? 'live' : 'ringing', key = state + this.other + (this.local.muted ? 'm' : '');
+    if (w.dataset.key !== key) {
+      w.dataset.key = key; w.dataset.state = state; w.className = 'callwin ' + state + (this.local.muted ? ' muted' : '');
+      const mic = this.local.muted
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M4 4l16 16"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>';
+      w.innerHTML = `<div class="cw-video">${Art.callFace(this.other)}${state === 'ringing' ? `<span class="cw-calling">${esc(this.t('call_ringing'))}</span>` : ''}</div>
+        <div class="cw-top"><span class="cw-dot"></span><span class="cw-name">${esc(this.name(this.other))}</span><span class="cw-time" data-calltime></span></div>
+        <span class="cw-self av av-${this.role}" aria-hidden="true">${esc(this.t('avatar_' + this.role))}</span>
+        <div class="cw-ctrls"><button type="button" class="cw-btn" data-act="call-mute" aria-label="${esc(this.t(this.local.muted ? 'call_unmute' : 'call_mute'))}">${mic}</button><button type="button" class="cw-btn end" data-act="call-end" aria-label="${esc(this.t('call_end_btn'))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14.5c5.5-4.6 12.5-4.6 18 0l-2.4 2.6-3.6-1.6v-2.6c-2-.6-4-.6-6 0v2.6l-3.6 1.6z"/></svg></button></div>`;
+      w.setAttribute('role', 'region'); w.setAttribute('aria-label', this.t('call_q', { name: this.name(this.other) }));
+      if (w.hidden) { w.hidden = false; this.el.stage.classList.add('has-call'); if (!reduceMotion()) { w.classList.add('pop'); } this.placeCall(true); this.dragCall(); }
+    }
+    w.classList.toggle('no-talk', !c.live || this.local.muted);
+    this.callMini();
+    clearInterval(this.callTimer); this.callTimer = null;
+    const tick = () => { const el = w.querySelector('[data-calltime]'); if (!el) return; if (!c.live) { el.textContent = ''; return; } const s = Math.max(0, Math.floor((Date.now() - c.since) / 1000)); el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    tick(); if (c.live) this.callTimer = setInterval(tick, 1000);
+  }
+  // while a card, letter or selfie is open the call shrinks to a pill above it, so it never disappears
+  callMini() {
+    const w = this.el.call; if (!w || w.hidden) return;
+    const mini = !!this.local.overlay && this.local.overlay !== 'call';
+    if (w.classList.contains('mini') === mini) return;
+    w.classList.toggle('mini', mini); w.classList.remove('pop'); this.el.app.classList.toggle('call-mini', mini);
+    if (!mini) this.placeCall();
+  }
+  // keep the window inside the room, below the top bar; it docks to the nearest side
+  placeCall(first) {
+    const w = this.el.call; if (!w || w.hidden) return;
+    const sr = this.el.stage.getBoundingClientRect(), top = this.topSafe() + 4;
+    const pos = this.local.callPos || { side: 'right', y: 0 };
+    const maxY = Math.max(top, sr.height - 26 - w.offsetHeight - 10);
+    const y = Math.min(maxY, Math.max(top, top + pos.y));
+    w.style.top = y + 'px';
+    w.style.left = pos.side === 'left' ? '10px' : (sr.width - w.offsetWidth - 10) + 'px';
+    this.later(() => this.placeBubble(), first ? 40 : 340);
+  }
+  dragCall() {
+    const w = this.el.call; if (!w || w.dataset.drag) return; w.dataset.drag = '1';
+    let st = null;
+    w.addEventListener('pointerdown', e => {
+      if (e.target.closest('button') || w.classList.contains('mini')) return;
+      const r = w.getBoundingClientRect(); st = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, moved: false };
+      w.setPointerCapture(e.pointerId); w.classList.add('dragging');
+    });
+    w.addEventListener('pointermove', e => {
+      if (!st) return; const dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) st.moved = true;
+      const sr = this.el.stage.getBoundingClientRect();
+      w.style.left = (st.l - sr.left + dx) + 'px'; w.style.top = (st.t - sr.top + dy) + 'px';
+    });
+    const end = () => {
+      if (!st) return; w.classList.remove('dragging');
+      const sr = this.el.stage.getBoundingClientRect(), r = w.getBoundingClientRect();
+      if (st.moved) this.local.callPos = { side: r.left + r.width / 2 < sr.left + sr.width / 2 ? 'left' : 'right', y: r.top - sr.top - this.topSafe() - 4 };
+      st = null; this.placeCall();
+    };
+    w.addEventListener('pointerup', end); w.addEventListener('pointercancel', end);
   }
   // a little dust cloud where PIP lands (stage coordinates)
   puff(x, y, s = 1) {

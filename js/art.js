@@ -249,3 +249,26 @@ Art.dish = function (dish, twist) {
     `<ellipse cx="60" cy="50" rx="39" ry="15.5" fill="#F6F0E6"/>` +
     `<g transform="translate(60 46) scale(1.16) translate(-60 -46)">` + food + tw + `</g></svg>`;
 };
+
+// faces for the video-call window: flat, no outlines, drawn in each person's own room.
+// The mouth, eyes and head carry classes so CSS can make them talk, blink and nod.
+Art.callFace = function (role) {
+  const g = role === 'grandma';
+  const room = g
+    ? `<rect width="120" height="160" fill="#F4ECE3"/><rect x="-4" y="6" width="40" height="78" rx="3" fill="#FFF7EC"/><path d="M-4 4h20c-3 26 4 52-4 82h-16z" fill="#EFC5BB"/><rect x="84" y="14" width="26" height="30" rx="2" fill="#C69468"/><rect x="87" y="17" width="20" height="24" fill="#F6ECDF"/><path d="M92 37c1-8 6-13 12-14-1 7-6 12-12 14z" fill="#9FB79C"/>`
+    : `<rect width="120" height="160" fill="#EBDDC9"/><rect x="-4" y="10" width="36" height="66" rx="2" fill="#F1D8C2"/><rect x="0" y="40" width="9" height="36" fill="#C9B19C"/><rect x="11" y="30" width="10" height="46" fill="#BCA58F"/><rect x="22" y="46" width="8" height="30" fill="#CBB59F"/><rect x="78" y="34" width="38" height="4" rx="2" fill="#7E5434"/><path d="M95 34c-3-9 2-14 6-16 2 5 1 12-6 16z" fill="#62704A"/><rect x="84" y="24" width="8" height="10" rx="1.5" fill="#D9944A"/>`;
+  const body = g
+    ? `<path d="M12 164c4-34 24-48 48-48s44 14 48 48z" fill="#9DB59A"/><path d="M48 117l12 18 12-18c-4-2-8-3-12-3s-8 1-12 3z" fill="#FFF8EE"/><circle cx="60" cy="146" r="2.4" fill="#F4EDE4"/><circle cx="60" cy="156" r="2.4" fill="#F4EDE4"/>`
+    : `<path d="M12 164c4-34 24-48 48-48s44 14 48 48z" fill="#7FA4C9"/><path d="M44 118c4 8 10 12 16 12s12-4 16-12c-5-2-10-3-16-3s-11 1-16 3z" fill="#6E93B8"/><path d="M53 128v14M67 128v14" stroke="#F4EDE4" stroke-width="2.2" stroke-linecap="round"/>`;
+  const hair = g
+    ? `<circle cx="60" cy="38" r="11" fill="#D6D2CD"/><path d="M32 76C30 48 44 41 60 41s30 7 28 35c-3-15-13-22-28-22S35 61 32 76z" fill="#DAD6D1"/>`
+    : `<path d="M33 72C30 46 45 37 61 37c18 0 28 11 26 34-3-12-11-19-26-18-10 0-18 4-24 11 0-6 2-10 5-14-5 4-8 12-9 22z" fill="#4A3A35"/>`;
+  const glasses = g ? `<g fill="none" stroke="#7A5A48" stroke-width="1.8"><circle cx="49" cy="78" r="8"/><circle cx="71" cy="78" r="8"/><path d="M57 78h6"/></g>` : '';
+  return `<svg class="call-face" viewBox="0 0 120 160" aria-hidden="true">${room}${body}` +
+    `<g class="cf-head"><rect x="52" y="98" width="16" height="22" rx="6" fill="${g ? '#EFC6A6' : '#EDC3A2'}"/>` +
+    `<ellipse cx="33" cy="80" rx="4" ry="6" fill="${g ? '#F0C4A3' : '#EBC09F'}"/><ellipse cx="87" cy="80" rx="4" ry="6" fill="${g ? '#F0C4A3' : '#EBC09F'}"/>` +
+    `<ellipse cx="60" cy="76" rx="27" ry="31" fill="${g ? '#F6D3B5' : '#F2CDAE'}"/>${hair}` +
+    `<g class="cf-eyes" fill="#4B2E24"><ellipse cx="49" cy="79" rx="2.3" ry="2.8"/><ellipse cx="71" cy="79" rx="2.3" ry="2.8"/></g>${glasses}` +
+    `<g fill="#F4A8A0" opacity=".6"><ellipse cx="43" cy="90" rx="5" ry="3"/><ellipse cx="77" cy="90" rx="5" ry="3"/></g>` +
+    `<path class="cf-mouth" d="M53 93q7 8 14 0q-7 3.5-14 0z" fill="#B5584A"/></g></svg>`;
+};

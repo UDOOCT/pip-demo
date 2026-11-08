@@ -7,6 +7,10 @@ for a grandparent and a grandchild to play from their own homes.
 and PIP carries every step between them. The other games on the shelf (garden, drawing, stories, singing,
 chess, photos, walks, letters) are placeholders that show where PIP goes next.
 
+A **video call** keeps them face to face the whole time: the other person's face floats in a small window
+you can drag to either side, shrinks to a pill above any card that opens, and hanging up ends it on both phones.
+(In this prototype the faces are animated drawings; no camera or microphone is streamed.)
+
 Made for the **WashUX Design-A-Thon 2026**.
 
 Live demo: https://udooct.github.io/pip-demo/
@@ -17,6 +21,7 @@ Live demo: https://udooct.github.io/pip-demo/
 - **One screen:** add `?view=both` to the link to see both phones side by side.
 
 The story:
+0. PIP offers a video call. Steven sees "Grandma is calling…" and joins.
 1. Grandma picks a dish, and PIP carries the invitation to Steven.
 2. Grandma decides what goes in first and adds her secret touch.
 3. Steven adds each ingredient, adds his own twist, and stirs.
