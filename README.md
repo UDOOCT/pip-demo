@@ -1,17 +1,86 @@
 # PIP · Grandma's Kitchen
 
-A two-phone demo for the WashUX Design-A-Thon 2026. PIP is a shared fluffy companion: Grandma teaches a family dish on one phone, Steven cooks it on the other, and PIP hops between the two screens carrying each person's part.
+PIP is a shared, fluffy companion that hops between two phones.
+Grandma teaches a dish on her phone, Steven cooks it on his, and PIP carries every step between them.
+Made for the **WashUX Design-A-Thon 2026**.
 
-- **Cooking, live on both phones.** Steven cracks, chops, pours, tosses and stirs in his wok (drag the ingredient from PIP, circle the wok, or tap it to toss) while Grandma watches through a little window on her phone. PIP plates the dish, tastes it and reacts.
-- **Turn-taking you can see.** A "Your turn" / "Grandma's turn" chip, a "Grandma is watching" badge, and PIP looking at your finger.
-- **Touch PIP.** Tap to say hi, tap three times to spin, press and hold to pet (hearts).
-- **Cooking photo.** After the meal each phone takes its own selfie (front camera, a picked photo, or skip for a drawn portrait). Both phones then make the same keepsake photo: the two selfies, PIP and the dish. Save or share it; it also shows up in "Our Little Moments".
+Live demo: https://udooct.github.io/pip-demo/
 
-No sign-up. The two phones sync in real time through free public MQTT message servers (each phone uses two servers at once for reliability). Selfies are encrypted with a key made from the kitchen code before they leave the phone, the kitchen code itself never appears on the servers, and selfies are removed from the servers when the session ends. Everything else is just dish choices and taps.
+## Try it
 
-## Use it
-- Open the page and tap **Start a new kitchen**, then open one link on each phone (or scan the QR code).
-- Or open `?view=both` to see both phones side by side on one screen (works offline).
-- The camera needs the page to be opened over https (GitHub Pages is) and permission on each phone. Without a camera, pick a photo or skip.
+- **Two phones:** open the link on one phone and tap **Start a new kitchen**. Each phone opens its own link or QR code: one is Grandma, one is Steven.
+- **One screen:** add `?view=both` to the link to see both phones side by side.
 
-Built with the team's own PIP sketch as the starting point; code written with help from Claude (AI). Libraries: MQTT.js, qrcode-generator (MIT). Fonts: Fredoka, Nunito (SIL OFL).
+The story:
+1. Grandma picks a dish, and PIP carries the invitation to Steven.
+2. Grandma decides what goes in first and adds her secret touch.
+3. Steven adds each ingredient, adds his own twist, and stirs.
+4. Grandma calls "serve", and PIP tastes the dish.
+5. Each of them takes a selfie, and PIP turns both selfies, itself and the dish into one keepsake photo.
+
+## Run it on your computer
+
+Nothing to install, and there is no build step. Start any static file server in this folder:
+
+```
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000. The camera only works on `http://localhost` or `https://`.
+
+## Put it online
+
+This is a plain static site, so you can upload the folder as it is:
+
+- **GitHub Pages:** push the folder to a repository. Then open Settings → Pages → Deploy from a branch, and pick the root folder.
+- **Netlify Drop:** drag the folder onto https://app.netlify.com/drop.
+- **Figma Make:** import the folder as a project. It is static HTML, CSS and JavaScript, with no setup scripts.
+
+## What's where
+
+| File | What it does |
+|---|---|
+| `index.html` | The page shell. It loads every file below, in order. |
+| `css/styles.css` | All the styling: colors, layout and animations. |
+| `js/config.js` | Build flag: this copy syncs the two phones over MQTT. |
+| `js/art.js` | PIP's fluffy body and faces, plus the ingredients, dishes and icons. |
+| `js/scenes.js` | Grandma's and Steven's kitchens and living rooms (SVG). |
+| `js/data.js` | Dishes, ingredients and every line of on-screen text. **Edit wording here.** |
+| `js/sync.js` | The shared cooking state. Each phone writes only its own document. |
+| `js/mqtt-hub.js` | Real-time sync between the phones, and encryption for the selfies. |
+| `js/cook.js` | The cooking stage (canvas): flames, wok, food that falls and sizzles, stirring, plating. |
+| `js/photo.js` | The selfie camera and the group photo. |
+| `js/app.js` | One phone's screens and interactions, for Grandma or Steven. |
+| `js/boot-web.js` | The start page, kitchen codes, QR links and the both-phones view. |
+| `vendor/mqtt.min.js` | MQTT.js, the client library for the message servers. |
+| `vendor/qrcode.js` | QR code generator. |
+
+Load order matters, because each file uses things defined in the files before it.
+If you add a file, add its `<script>` tag to `index.html` in the right place.
+
+## Link options
+
+| Link | Opens |
+|---|---|
+| no parameters | the start page |
+| `?room=CODE` | role picker and share links for that kitchen |
+| `?room=CODE&role=grandma` or `&role=steven` | this phone plays that role |
+| `?view=both` or `#both` | both phones on one screen |
+
+## How the sync works
+
+**Connection.** Each phone connects to two free public MQTT brokers over secure WebSockets: `broker.emqx.io` and `broker.hivemq.com`. An MQTT broker is a real-time message server. Every update goes through both brokers, so the demo keeps working if one network path is blocked.
+
+**Shared state.** Each phone writes only its own role document. Both phones work out the same cooking step from the two documents. The documents are kept ("retained") on the brokers, so a phone that reloads catches up right away.
+
+**Privacy.** The kitchen code is turned into two things with PBKDF2: an AES-GCM key, and the channel name used on the servers.
+- Selfies are encrypted with that key on the phone, before they leave it.
+- Because the channel name is derived too, the kitchen code itself never appears on the servers.
+- So anyone watching the public servers sees neither the kitchen code nor anyone's face.
+- Photos are removed from the servers once the session moves on.
+
+## Notes
+
+- The layout is designed for a phone held upright. On a computer it shows a phone-sized layout.
+- If the camera isn't available, you can pick a photo instead, or skip and PIP draws you.
+- All illustrations are original and drawn in code.
